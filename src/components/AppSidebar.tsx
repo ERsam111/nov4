@@ -13,7 +13,8 @@ import {
   Calendar,
   HardDrive,
   Trash2,
-  MoreVertical
+  MoreVertical,
+  Pencil
 } from 'lucide-react';
 import {
   Sidebar,
@@ -48,6 +49,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const navigationItems = [
@@ -62,13 +67,16 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { projects, deleteProject } = useProjects();
+  const { projects, deleteProject, updateProject } = useProjects();
   const { user } = useAuth();
   const [projectsOpen, setProjectsOpen] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<typeof navigationItems[0] | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [projectToRename, setProjectToRename] = useState<string | null>(null);
+  const [newProjectName, setNewProjectName] = useState('');
 
   const isActive = (path: string) => location.pathname === path;
   const collapsed = state === 'collapsed';
@@ -100,12 +108,29 @@ export function AppSidebar() {
     setDeleteDialogOpen(true);
   };
 
+  const handleRenameClick = (projectId: string, currentName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setProjectToRename(projectId);
+    setNewProjectName(currentName);
+    setRenameDialogOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (projectToDelete) {
       await deleteProject(projectToDelete);
       toast.success('Project deleted successfully');
       setProjectToDelete(null);
       setDeleteDialogOpen(false);
+    }
+  };
+
+  const confirmRename = async () => {
+    if (projectToRename && newProjectName.trim()) {
+      await updateProject(projectToRename, { name: newProjectName.trim() });
+      toast.success('Project renamed successfully');
+      setProjectToRename(null);
+      setNewProjectName('');
+      setRenameDialogOpen(false);
     }
   };
 
@@ -200,6 +225,12 @@ export function AppSidebar() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="z-50">
                                   <DropdownMenuItem
+                                    onClick={(e) => handleRenameClick(project.id, project.name, e)}
+                                  >
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Rename Project
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     className="text-destructive focus:text-destructive"
                                     onClick={(e) => handleDeleteClick(project.id, e)}
                                   >
@@ -247,6 +278,37 @@ export function AppSidebar() {
           redirectTo={selectedTool.url}
         />
       )}
+
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent className="bg-background">
+          <DialogHeader>
+            <DialogTitle>Rename Project</DialogTitle>
+            <DialogDescription>
+              Enter a new name for this project.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="project-name">Project Name</Label>
+              <Input
+                id="project-name"
+                placeholder="Enter project name"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && confirmRename()}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmRename} disabled={!newProjectName.trim()}>
+              Rename
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

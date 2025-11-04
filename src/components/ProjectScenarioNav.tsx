@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, FolderOpen, GitBranch, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, FolderOpen, GitBranch, Plus, Trash2, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +46,7 @@ export const ProjectScenarioNav = ({
   onScenarioChange,
 }: ProjectScenarioNavProps) => {
   const { projects } = useProjects();
-  const { scenarios, loadScenariosByProject, createScenario, deleteScenario, setCurrentScenario, currentScenario } = useScenarios();
+  const { scenarios, loadScenariosByProject, createScenario, deleteScenario, updateScenario, setCurrentScenario, currentScenario } = useScenarios();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [createProjectOpen, setCreateProjectOpen] = useState(false);
   const [createScenarioOpen, setCreateScenarioOpen] = useState(false);
@@ -54,6 +54,9 @@ export const ProjectScenarioNav = ({
   const [scenarioDescription, setScenarioDescription] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scenarioToDelete, setScenarioToDelete] = useState<string | null>(null);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [scenarioToRename, setScenarioToRename] = useState<string | null>(null);
+  const [newScenarioName, setNewScenarioName] = useState('');
 
   // Filter projects by module type
   const moduleProjects = projects.filter(p => p.tool_type === moduleType);
@@ -94,6 +97,16 @@ export const ProjectScenarioNav = ({
       }
       setScenarioToDelete(null);
       setDeleteDialogOpen(false);
+    }
+  };
+
+  const handleRenameScenario = async () => {
+    if (scenarioToRename && newScenarioName.trim()) {
+      await updateScenario(scenarioToRename, { name: newScenarioName.trim() });
+      toast.success("Scenario renamed successfully");
+      setScenarioToRename(null);
+      setNewScenarioName('');
+      setRenameDialogOpen(false);
     }
   };
 
@@ -243,6 +256,17 @@ export const ProjectScenarioNav = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              setScenarioToRename(scenario.id);
+                              setNewScenarioName(scenario.name);
+                              setRenameDialogOpen(true);
+                            }}
+                            className="p-1 hover:bg-accent rounded"
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setScenarioToDelete(scenario.id);
                               setDeleteDialogOpen(true);
                             }}
@@ -313,6 +337,38 @@ export const ProjectScenarioNav = ({
             </Button>
             <Button onClick={handleCreateScenario}>
               Create Scenario
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename Scenario Dialog */}
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent className="bg-background">
+          <DialogHeader>
+            <DialogTitle>Rename Scenario</DialogTitle>
+            <DialogDescription>
+              Enter a new name for this scenario.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="scenario-rename">Scenario Name</Label>
+              <Input
+                id="scenario-rename"
+                placeholder="Enter scenario name"
+                value={newScenarioName}
+                onChange={(e) => setNewScenarioName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRenameScenario()}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRenameScenario} disabled={!newScenarioName.trim()}>
+              Rename
             </Button>
           </DialogFooter>
         </DialogContent>
