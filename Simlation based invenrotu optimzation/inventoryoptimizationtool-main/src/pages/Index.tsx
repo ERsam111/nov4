@@ -753,7 +753,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           </TabsList>
 
           {/* --- Input Tables --- */}
-          <TabsContent value="input" className="mt-2">
+          <TabsContent value="input" className="mt-1">
             <div className="flex gap-4 h-[calc(100vh-250px)]">
               {/* Left Sidebar - Table Names */}
               <Card className="w-80 flex-shrink-0 flex flex-col">
