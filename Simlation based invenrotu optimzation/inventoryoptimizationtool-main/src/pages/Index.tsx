@@ -765,13 +765,13 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                   <CardDescription className="text-xs">Select a table to edit</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 flex flex-col min-h-0">
-                  <div className="p-4 space-y-2 border-b">
+                  <div className="p-3 flex gap-2 border-b">
                     <Button 
                       onClick={() => {
                         downloadTemplate(tables);
                         toast.success("Template downloaded successfully!");
                       }}
-                      className="w-full"
+                      className="flex-1"
                       variant="outline"
                       size="sm"
                     >
@@ -780,7 +780,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                     </Button>
                     <Button 
                       onClick={() => document.getElementById('excel-upload')?.click()}
-                      className="w-full"
+                      className="flex-1"
                       variant="outline"
                       size="sm"
                     >
