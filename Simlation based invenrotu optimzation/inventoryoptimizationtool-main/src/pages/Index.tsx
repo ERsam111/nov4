@@ -742,31 +742,19 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-background to-accent/20">
-      <div className="p-6 h-full max-w-[1600px]">
+    <div className="h-full bg-background">
+      <div className="max-w-[1800px] mx-auto w-full p-6 flex-1 space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-6 bg-card border border-border shadow-md w-full max-w-4xl">
-            <TabsTrigger value="input" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              Input Data
-            </TabsTrigger>
-            <TabsTrigger value="network" className="flex items-center gap-2">
-              <Network className="h-4 w-4" />
-              Network Map
-            </TabsTrigger>
-            <TabsTrigger value="simulation" className="flex items-center gap-2">
-              <Play className="h-4 w-4" />
-              Run Simulation
-            </TabsTrigger>
-            <TabsTrigger value="results" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Results
-            </TabsTrigger>
+          <TabsList>
+            <TabsTrigger value="input">Input Tables</TabsTrigger>
+            <TabsTrigger value="network">Map View</TabsTrigger>
+            <TabsTrigger value="simulation">Run Simulation</TabsTrigger>
+            <TabsTrigger value="results">Results</TabsTrigger>
           </TabsList>
 
           {/* --- Input Tables --- */}
-          <TabsContent value="input" className="w-full">
-            <div className="flex gap-4 h-[calc(100vh-280px)]">
+          <TabsContent value="input" className="mt-6">
+            <div className="flex gap-4 h-[calc(100vh-250px)]">
               {/* Left Sidebar - Table Names */}
               <Card className="w-64 flex-shrink-0 shadow-lg flex flex-col">
                 <CardHeader className="pb-3 border-b">
@@ -840,7 +828,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           </TabsContent>
 
           {/* --- Network Map --- */}
-          <TabsContent value="network" className="space-y-4">
+          <TabsContent value="network" className="mt-6">
             <NetworkMap
               customerData={customerData}
               facilityData={facilityData}
@@ -850,7 +838,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           </TabsContent>
 
           {/* --- Simulation Config --- */}
-          <TabsContent value="simulation" className="space-y-6">
+          <TabsContent value="simulation" className="mt-6 space-y-6">
             <TimeComponentInfo />
             
             <Card className="border-border shadow-lg">
@@ -935,7 +923,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           </TabsContent>
 
           {/* --- Results --- */}
-          <TabsContent value="results" className="space-y-4">
+          <TabsContent value="results" className="mt-6 space-y-6">
             {simulationResults.length > 0 && (
               <Card className="border-border shadow-lg">
                 <CardHeader>
