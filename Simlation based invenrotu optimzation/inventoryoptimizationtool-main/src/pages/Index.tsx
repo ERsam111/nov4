@@ -743,7 +743,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
 
   return (
     <div className="h-full bg-background">
-      <div className="max-w-[1800px] mx-auto w-full p-6 flex-1 space-y-6">
+      <div className="max-w-[1800px] mx-auto w-full p-6 h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
             <TabsTrigger value="input">Input Tables</TabsTrigger>
@@ -756,33 +756,36 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           <TabsContent value="input" className="mt-6">
             <div className="flex gap-4 h-[calc(100vh-250px)]">
               {/* Left Sidebar - Table Names */}
-              <Card className="w-64 flex-shrink-0 shadow-lg flex flex-col">
+              <Card className="w-80 flex-shrink-0 flex flex-col">
                 <CardHeader className="pb-3 border-b">
-                  <CardTitle className="text-lg">Input Tables</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Database className="h-5 w-5" />
+                    Input Tables
+                  </CardTitle>
                   <CardDescription className="text-xs">Select a table to edit</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 flex flex-col min-h-0">
-                  <div className="p-3 space-y-2 border-b bg-accent/10">
+                  <div className="p-4 space-y-2 border-b">
                     <Button 
                       onClick={() => {
                         downloadTemplate(tables);
                         toast.success("Template downloaded successfully!");
                       }}
-                      className="w-full h-9 text-xs"
-                      variant="default"
+                      className="w-full"
+                      variant="outline"
                       size="sm"
                     >
-                      <Download className="mr-2 h-3.5 w-3.5" />
-                      Download Template
+                      <Download className="mr-2 h-4 w-4" />
+                      Export
                     </Button>
                     <Button 
                       onClick={() => document.getElementById('excel-upload')?.click()}
-                      className="w-full h-9 text-xs"
-                      variant="secondary"
+                      className="w-full"
+                      variant="outline"
                       size="sm"
                     >
-                      <Upload className="mr-2 h-3.5 w-3.5" />
-                      Import Excel
+                      <Upload className="mr-2 h-4 w-4" />
+                      Import
                     </Button>
                     <input
                       id="excel-upload"
@@ -793,16 +796,22 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                     />
                   </div>
                   <ScrollArea className="flex-1">
-                    <div className="py-1">
+                    <div className="p-2 space-y-1">
                       {tables.map((table) => (
                         <button
                           key={table.id}
                           onClick={() => setSelectedTable(table.id)}
-                          className={`w-full text-left px-4 py-2.5 border-b border-border hover:bg-accent/50 transition-colors ${
-                            selectedTable === table.id ? "bg-primary/10 border-l-4 border-l-primary font-medium" : ""
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm hover:bg-accent transition-colors ${
+                            selectedTable === table.id ? "bg-primary/10 text-primary font-medium" : ""
                           }`}
                         >
-                          <div className="text-sm">{table.name}</div>
+                          <span className="flex items-center gap-2">
+                            <ClipboardList className="h-3 w-3" />
+                            {table.name}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted">
+                            {table.data.length}
+                          </span>
                         </button>
                       ))}
                     </div>

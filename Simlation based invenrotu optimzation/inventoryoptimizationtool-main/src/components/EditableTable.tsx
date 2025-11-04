@@ -90,47 +90,40 @@ export const EditableTable = ({
   };
 
   return (
-    <Card className="border-border shadow-md">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-foreground">{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
-        </div>
-        <Button onClick={handleAddRow} size="sm" variant="default">
+    <Card className="flex flex-col h-full">
+      <div className="p-4 border-b flex items-center justify-between">
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <Button onClick={handleAddRow} size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Row
         </Button>
-      </CardHeader>
+      </div>
 
-      <CardContent>
-        <ScrollArea className="h-[400px] w-full overflow-x-auto">
-          <div className="min-w-full w-max">
-            <Table className="table-auto">
-              <TableHeader>
-                <TableRow className="bg-accent hover:bg-accent">
-                  {columns.map((col) => (
-                    <TableHead
-                      key={col}
-                      className="font-semibold text-accent-foreground whitespace-nowrap min-w-[75px] px-2 py-2"
-                    >
-                      {col}
-                    </TableHead>
-                  ))}
-                  <TableHead className="font-semibold text-accent-foreground whitespace-nowrap w-[50px] px-2 py-2">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
+      <div className="flex-1 overflow-auto p-4">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((col) => (
+                <TableHead
+                  key={col}
+                  className="min-w-[150px]"
+                >
+                  {col}
+                </TableHead>
+              ))}
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
 
-              <TableBody>
-                {data.map((row, rowIndex) => (
-                  <TableRow key={rowIndex} className="hover:bg-muted/50">
-                    {columns.map((col) => (
-                      <TableCell
-                        key={col}
-                        className="whitespace-nowrap cursor-pointer min-w-[75px] px-2 py-2"
-                        onClick={() => col !== "Parameter Setup" && handleCellClick(rowIndex, col, row[col])}
-                      >
+          <TableBody>
+            {data.map((row, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {columns.map((col) => (
+                  <TableCell
+                    key={col}
+                    className="cursor-pointer"
+                    onClick={() => col !== "Parameter Setup" && handleCellClick(rowIndex, col, row[col])}
+                  >
                         {/* === DIALOG TYPES === */}
                         {col === "Parameter Setup" ? (
                           <ParameterSetupDialog
@@ -226,33 +219,29 @@ export const EditableTable = ({
                                 <Button onClick={handleCellSave} size="sm" variant="ghost" className="h-8 px-2">
                                   <Save className="h-4 w-4" />
                                 </Button>
-                              </>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-foreground">{row[col] ?? ""}</span>
-                        )}
-                      </TableCell>
-                    ))}
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <span>{row[col] ?? ""}</span>
+                )}
+              </TableCell>
+            ))}
 
-                    <TableCell className="w-[50px] px-2 py-2">
-                      <Button
-                        onClick={() => handleDeleteRow(rowIndex)}
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-1 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </CardContent>
-    </Card>
+            <TableCell>
+              <Button
+                onClick={() => handleDeleteRow(rowIndex)}
+                size="sm"
+                variant="ghost"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+</Card>
   );
 };
