@@ -743,7 +743,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
 
   return (
     <div className="h-full bg-gradient-to-br from-background to-accent/20">
-      <div className="p-6 h-full">
+      <div className="p-6 h-full max-w-[1600px]">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-4 mb-6 bg-card border border-border shadow-md w-full max-w-4xl">
             <TabsTrigger value="input" className="flex items-center gap-2">
@@ -823,7 +823,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
               </Card>
 
               {/* Right Panel - Selected Table */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-auto">
                 {currentTable && (
                   <EditableTable
                     title={currentTable.name}
