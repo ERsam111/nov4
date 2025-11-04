@@ -75,11 +75,11 @@ const Dashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-gfa/10 via-forecasting/10 to-inventory/10 animate-gradient" />
         <div className="relative px-6 py-12 md:py-16">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center space-y-8 sm:space-y-10 md:space-y-12 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting to-inventory bg-clip-text text-transparent animate-gradient">
+            <div className="text-center space-y-6 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting to-inventory bg-clip-text text-transparent animate-gradient pb-2 leading-tight">
                 Supply Chain Optimization
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-6">
                 Advanced tools to streamline operations, reduce costs, and optimize your supply chain
               </p>
             </div>
