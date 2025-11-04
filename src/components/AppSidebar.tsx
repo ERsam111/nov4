@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   MapPin, 
@@ -14,7 +14,8 @@ import {
   HardDrive,
   Trash2,
   MoreVertical,
-  Pencil
+  Pencil,
+  Database
 } from 'lucide-react';
 import {
   Sidebar,
@@ -30,6 +31,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useProjects } from '@/contexts/ProjectContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useScenarios } from '@/contexts/ScenarioContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format } from 'date-fns';
 import { CreateProjectDialog } from './CreateProjectDialog';
@@ -67,7 +69,8 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { projects, deleteProject, updateProject } = useProjects();
+  const { projects, currentProject, setCurrentProject, deleteProject, updateProject, operationLoading: projectOperationLoading } = useProjects();
+  const { operationLoading: scenarioOperationLoading } = useScenarios();
   const { user } = useAuth();
   const [projectsOpen, setProjectsOpen] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -91,6 +94,10 @@ export function AppSidebar() {
   };
 
   const handleProjectClick = (projectId: string, toolType: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      setCurrentProject(project);
+    }
     const routeMap: Record<string, string> = {
       gfa: '/gfa',
       forecasting: '/demand-forecasting',
@@ -101,6 +108,16 @@ export function AppSidebar() {
     // Navigate with project ID in state
     navigate(route, { state: { projectId } });
   };
+
+  useEffect(() => {
+    // Update current project based on location state
+    if (location.state?.projectId) {
+      const project = projects.find(p => p.id === location.state.projectId);
+      if (project) {
+        setCurrentProject(project);
+      }
+    }
+  }, [location.state, projects, setCurrentProject]);
 
   const handleDeleteClick = (projectId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -200,7 +217,9 @@ export function AppSidebar() {
                         projects.map((project) => (
                           <SidebarMenuItem key={project.id}>
                             <div 
-                              className="px-3 py-2 text-sm hover:bg-accent rounded-md cursor-pointer group flex items-start justify-between"
+                              className={`px-3 py-2 text-sm hover:bg-accent rounded-md cursor-pointer group flex items-start justify-between transition-colors ${
+                                currentProject?.id === project.id ? 'bg-primary/10 border-l-2 border-primary' : ''
+                              }`}
                               onClick={() => handleProjectClick(project.id, project.tool_type)}
                             >
                               <div className="flex-1 min-w-0">
@@ -248,6 +267,18 @@ export function AppSidebar() {
                 </CollapsibleContent>
               </Collapsible>
             </SidebarGroup>
+          )}
+
+          {/* Database Status Indicator */}
+          {!collapsed && (projectOperationLoading || scenarioOperationLoading) && (
+            <div className="px-4 py-2 border-t">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Database className="h-3 w-3 animate-pulse" />
+                <span className="animate-pulse">
+                  {projectOperationLoading ? 'Saving project data...' : 'Saving scenario data...'}
+                </span>
+              </div>
+            </div>
           )}
 
           {/* Profile */}

@@ -32,6 +32,7 @@ interface ScenarioContextType {
   scenarios: Scenario[];
   currentScenario: Scenario | null;
   loading: boolean;
+  operationLoading: boolean;
   loadScenariosByProject: (projectId: string) => Promise<void>;
   createScenario: (scenario: Omit<Scenario, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Scenario | null>;
   updateScenario: (id: string, updates: Partial<Scenario>) => Promise<void>;
@@ -49,6 +50,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null);
   const [loading, setLoading] = useState(false);
+  const [operationLoading, setOperationLoading] = useState(false);
   const { user } = useAuth();
 
   const loadScenariosByProject = async (projectId: string) => {
@@ -112,18 +114,23 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const saveScenarioInput = async (scenarioId: string, inputData: any) => {
+    setOperationLoading(true);
     await (supabase as any)
       .from('scenario_inputs')
       .insert([{ scenario_id: scenarioId, input_data: inputData }]);
+    setOperationLoading(false);
   };
 
   const saveScenarioOutput = async (scenarioId: string, outputData: any) => {
+    setOperationLoading(true);
     await (supabase as any)
       .from('scenario_outputs')
       .insert([{ scenario_id: scenarioId, output_data: outputData }]);
+    setOperationLoading(false);
   };
 
   const loadScenarioInput = async (scenarioId: string) => {
+    setOperationLoading(true);
     const { data, error } = await (supabase as any)
       .from('scenario_inputs')
       .select('input_data')
@@ -132,6 +139,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
       .limit(1)
       .single();
 
+    setOperationLoading(false);
     if (!error && data) {
       return data.input_data;
     }
@@ -139,6 +147,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   const loadScenarioOutput = async (scenarioId: string) => {
+    setOperationLoading(true);
     const { data, error } = await (supabase as any)
       .from('scenario_outputs')
       .select('output_data')
@@ -147,6 +156,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
       .limit(1)
       .single();
 
+    setOperationLoading(false);
     if (!error && data) {
       return data.output_data;
     }
@@ -158,6 +168,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
       scenarios,
       currentScenario,
       loading,
+      operationLoading,
       loadScenariosByProject,
       createScenario,
       updateScenario,
