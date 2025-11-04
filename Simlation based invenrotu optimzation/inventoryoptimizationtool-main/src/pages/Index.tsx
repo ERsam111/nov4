@@ -588,31 +588,43 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         setIsSimulating(false);
         setSimulationProgress(0);
         
-        // Save to database in background (non-blocking)
-        if (currentScenario && updateScenario && saveScenarioOutput) {
+        // Update scenario status immediately
+        if (currentScenario && updateScenario) {
+          updateScenario(currentScenario.id, { status: 'completed' }).catch(console.error);
+        }
+        
+        // Save to database in background (non-blocking, with data compression)
+        if (currentScenario && saveScenarioOutput) {
           setIsSaving(true);
           
           // Use background save to avoid blocking UI
           (async () => {
             try {
-              await saveScenarioOutput(currentScenario.id, { 
-                scenarioResults, 
-                orderLogs, 
-                inventoryData: invData, 
-                productionLogs, 
-                productFlowLogs, 
-                tripLogs 
-              }, true); // Background save
-              await updateScenario(currentScenario.id, { status: 'completed' });
+              // Only save summary results and limited logs to avoid payload size issues
+              const summaryData = {
+                scenarioResults, // Keep full scenario results (this is the important summary data)
+                orderLogs: orderLogs.slice(0, 100), // Limit to first 100 orders
+                inventoryData: invData ? Object.keys(invData).reduce((acc, key) => {
+                  acc[key] = invData[key].slice(0, 50); // Limit inventory snapshots
+                  return acc;
+                }, {} as any) : {},
+                tripLogs: tripLogs.slice(0, 50), // Limit trip logs
+                totalRecords: {
+                  orders: orderLogs.length,
+                  trips: tripLogs.length,
+                  production: productionLogs.length,
+                  productFlow: productFlowLogs.length
+                }
+              };
+              
+              await saveScenarioOutput(currentScenario.id, summaryData, true);
               console.log("Results saved to database for scenario:", currentScenario.id);
               
-              toast.success("Results saved successfully!", {
-                description: "Your scenario results are now stored in the database",
-              });
+              toast.success("Results saved successfully!");
             } catch (saveError) {
               console.error("Error saving results:", saveError);
-              toast.error("Failed to save results", {
-                description: "Results are available in this session but may not persist",
+              toast.warning("Results displayed but not saved to database", {
+                description: "Results are available in this session",
               });
             } finally {
               setIsSaving(false);

@@ -184,6 +184,7 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
       }
     } catch (error) {
       console.error('Error saving scenario output:', error);
+      throw error; // Re-throw for caller to handle
     } finally {
       if (!background) {
         setOperationLoading(false);
