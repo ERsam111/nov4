@@ -213,12 +213,7 @@ const GFA = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-gfa/10 to-gfa/5 backdrop-blur border-b border-gfa/20">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 hover:text-gfa">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </div>
+          <h1 className="text-lg font-semibold text-gfa">Green Field Analysis</h1>
           {customers.length > 0 && (
             <Button onClick={handleExportReport} variant="outline" size="sm" className="gap-2 hover:border-gfa hover:text-gfa">
               <Download className="h-4 w-4" />

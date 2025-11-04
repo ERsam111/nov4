@@ -243,17 +243,7 @@ const DemandForecasting = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-forecasting/10 to-forecasting/5 backdrop-blur border-b border-forecasting/20">
         <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/dashboard")}
-              className="gap-2 hover:text-forecasting"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </div>
+          <h1 className="text-lg font-semibold text-forecasting">Demand Forecasting</h1>
           <Button
             onClick={() => navigate("/scenario2")}
             size="sm"
