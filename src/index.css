@@ -45,8 +45,8 @@ All colors MUST be HSL.
     --warning-amber: 38 92% 50%;
     
     /* Dashboard Tool Colors */
-    --gfa-teal: 180 65% 45%;
-    --gfa-teal-light: 180 65% 95%;
+    --gfa-green: 142 70% 45%;
+    --gfa-green-light: 142 70% 95%;
     --forecasting-purple: 270 65% 55%;
     --forecasting-purple-light: 270 65% 95%;
     --network-blue: 220 85% 55%;
@@ -58,7 +58,7 @@ All colors MUST be HSL.
     
     --gradient-logistics: linear-gradient(135deg, hsl(150 60% 45%) 0%, hsl(150 70% 35%) 100%);
     --gradient-data: linear-gradient(180deg, hsl(150 20% 97%) 0%, hsl(0 0% 100%) 100%);
-    --gradient-gfa: linear-gradient(135deg, hsl(180 65% 45%) 0%, hsl(180 75% 55%) 100%);
+    --gradient-gfa: linear-gradient(135deg, hsl(142 70% 45%) 0%, hsl(142 80% 55%) 100%);
     --gradient-forecasting: linear-gradient(135deg, hsl(270 65% 55%) 0%, hsl(270 75% 65%) 100%);
     --gradient-network: linear-gradient(135deg, hsl(220 85% 55%) 0%, hsl(220 90% 65%) 100%);
     --gradient-inventory: linear-gradient(135deg, hsl(25 90% 55%) 0%, hsl(25 95% 65%) 100%);
@@ -122,8 +122,8 @@ All colors MUST be HSL.
     --warning-amber: 38 92% 55%;
     
     /* Dashboard Tool Colors - Dark Mode */
-    --gfa-teal: 180 65% 55%;
-    --gfa-teal-light: 180 65% 20%;
+    --gfa-green: 142 70% 55%;
+    --gfa-green-light: 142 70% 20%;
     --forecasting-purple: 270 65% 65%;
     --forecasting-purple-light: 270 65% 20%;
     --network-blue: 220 85% 65%;
@@ -135,7 +135,7 @@ All colors MUST be HSL.
     
     --gradient-logistics: linear-gradient(135deg, hsl(150 60% 50%) 0%, hsl(150 70% 40%) 100%);
     --gradient-data: linear-gradient(180deg, hsl(150 20% 16%) 0%, hsl(150 20% 14%) 100%);
-    --gradient-gfa: linear-gradient(135deg, hsl(180 65% 55%) 0%, hsl(180 75% 45%) 100%);
+    --gradient-gfa: linear-gradient(135deg, hsl(142 70% 55%) 0%, hsl(142 80% 45%) 100%);
     --gradient-forecasting: linear-gradient(135deg, hsl(270 65% 65%) 0%, hsl(270 75% 55%) 100%);
     --gradient-network: linear-gradient(135deg, hsl(220 85% 65%) 0%, hsl(220 90% 55%) 100%);
     --gradient-inventory: linear-gradient(135deg, hsl(25 90% 65%) 0%, hsl(25 95% 55%) 100%);

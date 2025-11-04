@@ -58,8 +58,8 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         gfa: {
-          DEFAULT: "hsl(var(--gfa-teal))",
-          light: "hsl(var(--gfa-teal-light))",
+          DEFAULT: "hsl(var(--gfa-green))",
+          light: "hsl(var(--gfa-green-light))",
         },
         forecasting: {
           DEFAULT: "hsl(var(--forecasting-purple))",

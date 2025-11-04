@@ -211,16 +211,16 @@ const GFA = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-gfa/10 to-gfa/5 backdrop-blur border-b border-gfa/20">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 hover:text-gfa">
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
           </div>
           {customers.length > 0 && (
-            <Button onClick={handleExportReport} variant="outline" size="sm" className="gap-2">
+            <Button onClick={handleExportReport} variant="outline" size="sm" className="gap-2 hover:border-gfa hover:text-gfa">
               <Download className="h-4 w-4" />
               Export Report
             </Button>
@@ -229,20 +229,22 @@ const GFA = () => {
       </div>
 
       {/* Project & Scenario Navigation */}
-      <ProjectScenarioNav
-        currentProjectId={currentProject?.id}
-        currentScenarioId={currentScenario?.id}
-        moduleType="gfa"
-        moduleName="Green Field Analysis"
-        onProjectChange={(project) => {
-          setCurrentProject(project);
-          setCurrentScenario(null);
-          loadScenariosByProject(project.id, 'gfa'); // Filter by GFA module
-        }}
-        onScenarioChange={(scenario) => {
-          setCurrentScenario(scenario);
-        }}
-      />
+      <div className="border-b border-gfa/20 bg-gradient-to-r from-gfa-light to-transparent">
+        <ProjectScenarioNav
+          currentProjectId={currentProject?.id}
+          currentScenarioId={currentScenario?.id}
+          moduleType="gfa"
+          moduleName="Green Field Analysis"
+          onProjectChange={(project) => {
+            setCurrentProject(project);
+            setCurrentScenario(null);
+            loadScenariosByProject(project.id, 'gfa'); // Filter by GFA module
+          }}
+          onScenarioChange={(scenario) => {
+            setCurrentScenario(scenario);
+          }}
+        />
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 max-w-7xl mx-auto w-full p-6">

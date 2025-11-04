@@ -239,16 +239,16 @@ const DemandForecasting = () => {
   const uniqueCustomers = Array.from(new Set(historicalData.map(d => d.customer)));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background via-forecasting/5 to-background flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-forecasting/10 to-forecasting/5 backdrop-blur border-b border-forecasting/20">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/dashboard")}
-              className="gap-2"
+              className="gap-2 hover:text-forecasting"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -258,6 +258,7 @@ const DemandForecasting = () => {
             onClick={() => navigate("/scenario2")}
             size="sm"
             className="gap-2"
+            style={{ background: 'var(--gradient-forecasting)' }}
           >
             Next: Scenario 2
             <ArrowLeft className="h-4 w-4 rotate-180" />
@@ -266,19 +267,21 @@ const DemandForecasting = () => {
       </div>
 
       {/* Project & Scenario Navigation */}
-      <ProjectScenarioNav
-        currentProjectId={currentProject?.id}
-        currentScenarioId={currentScenario?.id}
-        moduleType="forecasting"
-        moduleName="Demand Forecasting"
-        onProjectChange={(project) => {
-          setCurrentProject(project);
-          loadScenariosByProject(project.id, 'forecasting'); // Filter by forecasting module
-        }}
-        onScenarioChange={(scenario) => {
-          setCurrentScenario(scenario);
-        }}
-      />
+      <div className="border-b border-forecasting/20 bg-gradient-to-r from-forecasting-light to-transparent">
+        <ProjectScenarioNav
+          currentProjectId={currentProject?.id}
+          currentScenarioId={currentScenario?.id}
+          moduleType="forecasting"
+          moduleName="Demand Forecasting"
+          onProjectChange={(project) => {
+            setCurrentProject(project);
+            loadScenariosByProject(project.id, 'forecasting'); // Filter by forecasting module
+          }}
+          onScenarioChange={(scenario) => {
+            setCurrentScenario(scenario);
+          }}
+        />
+      </div>
 
       <div className="container mx-auto px-4 py-8 flex-1">
 

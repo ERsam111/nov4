@@ -76,7 +76,7 @@ const Dashboard = () => {
         <div className="relative px-6 py-12 md:py-16">
           <div className="max-w-7xl mx-auto">
             <div className="text-center space-y-4 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting via-network to-inventory bg-clip-text text-transparent animate-gradient">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting to-inventory bg-clip-text text-transparent animate-gradient">
                 Supply Chain Optimization Suite
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">

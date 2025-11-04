@@ -39,23 +39,25 @@ export default function InventoryOptimizationV2() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-inventory/10 to-inventory/5 backdrop-blur border-b border-inventory/20">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="hover:text-inventory">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
         </div>
       </div>
       
       {/* Project & Scenario Navigation */}
-      <ProjectScenarioNav
-        currentProjectId={currentProject?.id}
-        currentScenarioId={currentScenario?.id}
-        moduleType="inventory"
-        moduleName="Simulation-based Inventory Optimization"
-        onProjectChange={handleProjectChange}
-        onScenarioChange={handleScenarioChange}
-      />
+      <div className="border-b border-inventory/20 bg-gradient-to-r from-inventory-light to-transparent">
+        <ProjectScenarioNav
+          currentProjectId={currentProject?.id}
+          currentScenarioId={currentScenario?.id}
+          moduleType="inventory"
+          moduleName="Simulation-based Inventory Optimization"
+          onProjectChange={handleProjectChange}
+          onScenarioChange={handleScenarioChange}
+        />
+      </div>
       
       <div className="flex-1">
         <InvIndex 
