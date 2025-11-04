@@ -61,9 +61,16 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to your Supply Chain Optimization Suite</p>
+      <div className="flex items-center gap-4">
+        <img 
+          src="https://storage.googleapis.com/gpt-engineer-file-uploads/AWxkmQkmcVcxhXikCwr0HoI55qo2/uploads/1761586609137-android-chrome-192x192.png" 
+          alt="Logo" 
+          className="h-12 w-12"
+        />
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Supply Chain Optimization Suite</h1>
+          <p className="text-muted-foreground">Advanced tools for optimizing your supply chain operations</p>
+        </div>
       </div>
 
       {/* Tools Grid */}
