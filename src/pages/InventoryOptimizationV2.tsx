@@ -38,15 +38,15 @@ export default function InventoryOptimizationV2() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-inventory/10 to-inventory/5 backdrop-blur border-b border-inventory/20 flex-shrink-0">
+    <div className="min-h-screen flex flex-col bg-background">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-inventory/10 to-inventory/5 backdrop-blur border-b border-inventory/20">
         <div className="max-w-6xl mx-auto px-4 py-2">
           <h1 className="text-lg font-semibold text-inventory">Inventory Optimization</h1>
         </div>
       </div>
       
       {/* Project & Scenario Navigation */}
-      <div className="border-b border-inventory/20 bg-gradient-to-r from-inventory-light to-transparent flex-shrink-0">
+      <div className="border-b border-inventory/20 bg-gradient-to-r from-inventory-light to-transparent">
         <ProjectScenarioNav
           currentProjectId={currentProject?.id}
           currentScenarioId={currentScenario?.id}
@@ -57,7 +57,7 @@ export default function InventoryOptimizationV2() {
         />
       </div>
       
-      <div className="flex-1 overflow-hidden min-h-0">
+      <div className="flex-1 overflow-hidden">
         <InvIndex
           currentScenario={currentScenario}
           updateScenario={updateScenario}
