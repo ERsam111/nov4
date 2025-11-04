@@ -652,8 +652,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-accent/20">
-      <div className="container mx-auto p-6 max-w-[1800px]">
+    <div className="h-full bg-gradient-to-br from-background to-accent/20">
+      <div className="container mx-auto p-6 max-w-[1800px] h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6 bg-card border border-border shadow-md">
             <TabsTrigger value="input" className="flex items-center gap-2">

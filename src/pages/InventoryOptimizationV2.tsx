@@ -57,8 +57,8 @@ export default function InventoryOptimizationV2() {
         />
       </div>
       
-      <div className="flex-1">
-        <InvIndex 
+      <div className="flex-1 overflow-hidden">
+        <InvIndex
           currentScenario={currentScenario}
           updateScenario={updateScenario}
           saveScenarioOutput={saveScenarioOutput}
