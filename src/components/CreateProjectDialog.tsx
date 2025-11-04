@@ -36,9 +36,21 @@ export function CreateProjectDialog({
   const { createProject } = useProjects();
   const navigate = useNavigate();
 
+  const { projects } = useProjects();
+
   const handleCreate = async () => {
     if (!name.trim()) {
       toast.error('Please enter a project name');
+      return;
+    }
+
+    // Check for duplicate project name
+    const duplicateProject = projects.find(
+      p => p.name.toLowerCase() === name.trim().toLowerCase() && p.tool_type === toolType
+    );
+    
+    if (duplicateProject) {
+      toast.error('A project with this name already exists. Please choose a different name.');
       return;
     }
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Button } from "../components/ui/button";
@@ -36,7 +36,7 @@ import {
 } from "../data/allTables";
 import { downloadTemplate, exportResultsToExcel, importFromExcel } from "../utils/excelExport";
 
-const Index = () => {
+const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenarioOutput }: any) => {
   const [replications, setReplications] = useState(10);
   const [simulationResults, setSimulationResults] = useState<any[]>([]);
   const [orderLogResults, setOrderLogResults] = useState<any[]>([]);
@@ -81,6 +81,23 @@ const Index = () => {
   const customerNames = Array.from(new Set(customerData.map((c: any) => c["Customer Name"])));
   const facilityNames = Array.from(new Set(facilityData.map((f: any) => f["Facility Name"])));
   const productNames = Array.from(new Set(productData.map((p: any) => p["Product Name"])));
+
+  // Load saved scenario data when scenario changes
+  useEffect(() => {
+    if (currentScenario && loadScenarioOutput) {
+      loadScenarioOutput(currentScenario.id).then((data: any) => {
+        if (data?.scenarioResults) {
+          setSimulationResults(data.scenarioResults);
+          setOrderLogResults(data.orderLogs || []);
+          setInventoryData(data.inventoryData || []);
+          setProductionLogResults(data.productionLogs || []);
+          setProductFlowLogResults(data.productFlowLogs || []);
+          setTripLogResults(data.tripLogs || []);
+          setActiveTab("results");
+        }
+      });
+    }
+  }, [currentScenario]);
 
   const tables = [
     { 
@@ -438,6 +455,29 @@ const Index = () => {
       description: `Running ${totalScenarios} scenarios with ${replications} replications each...`,
     });
 
+    // Save input data before running simulation
+    if (currentScenario && saveScenarioOutput) {
+      const inputData = {
+        customerData,
+        facilityData,
+        productData,
+        customerFulfillmentData,
+        replenishmentData,
+        productionData,
+        inventoryPolicyData,
+        warehousingData,
+        orderFulfillmentData,
+        transportationData,
+        customerOrderData,
+        inputFactorsData,
+        bomData,
+        replications,
+      };
+      
+      // Save as input in scenario_inputs table
+      await saveScenarioOutput(currentScenario.id, { input: inputData });
+    }
+
     try {
       const sim = await import("../lib/simulationEngine");
 
@@ -484,6 +524,19 @@ const Index = () => {
         toast.success("Simulation completed!", {
           description: `${scenarioResults.length} scenarios analyzed with ${replications} replications each`,
         });
+        
+        // Mark scenario as completed and save results
+        if (currentScenario && updateScenario && saveScenarioOutput) {
+          await updateScenario(currentScenario.id, { status: 'completed' });
+          await saveScenarioOutput(currentScenario.id, { 
+            scenarioResults, 
+            orderLogs, 
+            inventoryData: invData, 
+            productionLogs, 
+            productFlowLogs, 
+            tripLogs 
+          });
+        }
         
         // Auto-navigate to results
         setActiveTab("results");

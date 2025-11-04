@@ -89,6 +89,16 @@ export const ProjectScenarioNav = ({
       return;
     }
 
+    // Check for duplicate scenario name within the project
+    const duplicateScenario = scenarios.find(
+      s => s.name.toLowerCase() === scenarioName.trim().toLowerCase()
+    );
+    
+    if (duplicateScenario) {
+      toast.error('A scenario with this name already exists in this project. Please choose a different name.');
+      return;
+    }
+
     const newScenario = await createScenario({
       name: scenarioName,
       description: scenarioDescription || null,

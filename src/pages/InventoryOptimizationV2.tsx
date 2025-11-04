@@ -11,7 +11,7 @@ import { useScenarios } from "@/contexts/ScenarioContext";
 export default function InventoryOptimizationV2() {
   const navigate = useNavigate();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const { currentScenario, setCurrentScenario, loadScenariosByProject } = useScenarios();
+  const { currentScenario, setCurrentScenario, loadScenariosByProject, updateScenario, saveScenarioOutput, loadScenarioOutput } = useScenarios();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -39,7 +39,12 @@ export default function InventoryOptimizationV2() {
       />
       
       <div className="flex-1">
-        <InvIndex />
+        <InvIndex 
+          currentScenario={currentScenario}
+          updateScenario={updateScenario}
+          saveScenarioOutput={saveScenarioOutput}
+          loadScenarioOutput={loadScenarioOutput}
+        />
       </div>
     </div>
   );
