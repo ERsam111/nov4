@@ -36,13 +36,12 @@ export function DashboardLayout() {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 border-b flex items-center justify-between px-6 bg-background">
+          <header className="h-12 border-b flex items-center justify-between px-4 bg-background">
             <SidebarTrigger />
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">{user.email}</span>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium truncate max-w-[150px]">{user.email}</span>
+              <Button variant="ghost" size="sm" onClick={signOut} className="h-8 px-2">
+                <LogOut className="h-3 w-3" />
               </Button>
             </div>
           </header>

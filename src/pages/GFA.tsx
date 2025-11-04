@@ -212,7 +212,7 @@ const GFA = () => {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-gfa/10 to-gfa/5 backdrop-blur border-b border-gfa/20">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 hover:text-gfa">
               <ArrowLeft className="h-4 w-4" />

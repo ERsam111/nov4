@@ -40,7 +40,7 @@ export default function InventoryOptimizationV2() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <div className="sticky top-0 z-10 bg-gradient-to-r from-inventory/10 to-inventory/5 backdrop-blur border-b border-inventory/20">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
           <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="hover:text-inventory">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
