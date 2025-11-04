@@ -743,7 +743,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
 
   return (
     <div className="h-full bg-background">
-      <div className="max-w-[1800px] mx-auto w-full p-6 h-full">
+      <div className="max-w-[1800px] mx-auto w-full px-4 py-2 h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
             <TabsTrigger value="input">Input Tables</TabsTrigger>
