@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useProjects } from '@/contexts/ProjectContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -37,6 +38,49 @@ export function CreateProjectDialog({
   const navigate = useNavigate();
 
   const { projects } = useProjects();
+
+  const getModuleColors = () => {
+    switch (toolType) {
+      case 'gfa':
+        return {
+          gradient: 'from-gfa via-gfa/80 to-gfa/60',
+          text: 'text-gfa',
+          button: 'bg-gfa hover:bg-gfa/90',
+        };
+      case 'forecasting':
+        return {
+          gradient: 'from-forecasting via-forecasting/80 to-forecasting/60',
+          text: 'text-forecasting',
+          button: 'bg-forecasting hover:bg-forecasting/90',
+        };
+      case 'inventory':
+        return {
+          gradient: 'from-inventory via-inventory/80 to-inventory/60',
+          text: 'text-inventory',
+          button: 'bg-inventory hover:bg-inventory/90',
+        };
+      case 'network':
+        return {
+          gradient: 'from-network via-network/80 to-network/60',
+          text: 'text-network',
+          button: 'bg-network hover:bg-network/90',
+        };
+      case 'transportation':
+        return {
+          gradient: 'from-transportation via-transportation/80 to-transportation/60',
+          text: 'text-transportation',
+          button: 'bg-transportation hover:bg-transportation/90',
+        };
+      default:
+        return {
+          gradient: 'from-primary via-primary/80 to-primary/60',
+          text: 'text-primary',
+          button: 'bg-primary hover:bg-primary/90',
+        };
+    }
+  };
+
+  const colors = getModuleColors();
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -81,9 +125,9 @@ export function CreateProjectDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className={cn("bg-gradient-to-r rounded-t-lg p-6 -mt-6 -mx-6 mb-2", colors.gradient)}>
+          <DialogTitle className="text-white text-xl">Create New Project</DialogTitle>
+          <DialogDescription className="text-white/90">
             Create a new project for {toolName}
           </DialogDescription>
         </DialogHeader>
@@ -112,7 +156,7 @@ export function CreateProjectDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={loading}>
+          <Button onClick={handleCreate} disabled={loading} className={cn(colors.button, "text-white")}>
             {loading ? 'Creating...' : 'Create Project'}
           </Button>
         </DialogFooter>
