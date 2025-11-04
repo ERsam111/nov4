@@ -157,9 +157,11 @@ export function AppSidebar() {
         <SidebarHeader className="border-b p-4">
           {!collapsed && (
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">SC</span>
-              </div>
+              <img 
+                src="https://storage.googleapis.com/gpt-engineer-file-uploads/AWxkmQkmcVcxhXikCwr0HoI55qo2/uploads/1761586609137-android-chrome-192x192.png" 
+                alt="Logo" 
+                className="h-10 w-10 rounded-lg"
+              />
               <div className="flex-1">
                 <h2 className="font-semibold text-sm">Supply Chain</h2>
                 <p className="text-xs text-muted-foreground">Optimization Suite</p>
