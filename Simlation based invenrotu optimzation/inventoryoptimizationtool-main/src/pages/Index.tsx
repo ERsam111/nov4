@@ -652,10 +652,10 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-background to-accent/20">
-      <div className="container mx-auto p-6 max-w-[1800px] h-full">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 bg-card border border-border shadow-md">
+    <div className="h-full flex flex-col bg-gradient-to-br from-background to-accent/20 overflow-hidden">
+      <div className="container mx-auto px-6 pt-4 pb-2 max-w-[1800px] flex-shrink-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
+          <TabsList className="grid w-full grid-cols-4 mb-4 bg-card border border-border shadow-md flex-shrink-0">
             <TabsTrigger value="input" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Input Data
@@ -675,8 +675,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           </TabsList>
 
           {/* --- Input Tables --- */}
-          <TabsContent value="input" className="w-full">
-            <div className="flex gap-4 h-[calc(100vh-280px)]">
+          <TabsContent value="input" className="w-full flex-1 overflow-hidden flex flex-col min-h-0">
+            <div className="flex gap-4 flex-1 overflow-hidden pb-2">
               {/* Left Sidebar - Table Names */}
               <Card className="w-64 flex-shrink-0 shadow-lg flex flex-col">
                 <CardHeader className="pb-3 border-b">

@@ -33,10 +33,10 @@ export function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="h-screen flex w-full overflow-hidden">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-12 border-b flex items-center justify-between px-4 bg-background">
+        <div className="flex-1 flex flex-col border-l">
+          <header className="h-12 border-b flex items-center justify-between px-4 bg-background flex-shrink-0">
             <SidebarTrigger />
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium truncate max-w-[150px]">{user.email}</span>
@@ -45,7 +45,7 @@ export function DashboardLayout() {
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto min-h-0">
             <Outlet />
           </main>
         </div>
