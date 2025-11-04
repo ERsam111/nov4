@@ -743,9 +743,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
 
   return (
     <div className="h-full bg-gradient-to-br from-background to-accent/20">
-      <div className="container mx-auto p-6 max-w-[1800px] h-full">
+      <div className="p-6 h-full max-w-[1400px] mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 bg-card border border-border shadow-md">
+          <TabsList className="grid grid-cols-4 mb-6 bg-card border border-border shadow-md w-full max-w-4xl mx-auto">
             <TabsTrigger value="input" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Input Data
