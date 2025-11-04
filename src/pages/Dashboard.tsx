@@ -88,8 +88,8 @@ const Dashboard = () => {
       </div>
 
       {/* Tools Grid */}
-      <div className="px-6 pb-16 max-w-7xl mx-auto">
-        <div className="mb-8">
+      <div className="px-6 pb-20 max-w-7xl mx-auto">
+        <div className="mb-18">
 
           <p className="text-muted-foreground">Select a tool to create a new project and start optimizing</p>
         </div>
