@@ -39,12 +39,6 @@ export default function InventoryOptimizationV2() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-inventory/10 to-inventory/5 backdrop-blur border-b border-inventory/20">
-        <div className="max-w-6xl mx-auto px-4 py-2">
-          <h1 className="text-lg font-semibold text-inventory">Inventory Optimization</h1>
-        </div>
-      </div>
-      
       {/* Project & Scenario Navigation */}
       <div className="border-b border-inventory/20 bg-gradient-to-r from-inventory-light to-transparent">
         <ProjectScenarioNav
