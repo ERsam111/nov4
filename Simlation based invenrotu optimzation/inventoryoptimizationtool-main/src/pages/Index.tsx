@@ -47,6 +47,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   const [selectedTable, setSelectedTable] = useState<string>("customers");
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("input");
   
   // Filters for inventory graph and order log
@@ -559,8 +560,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           }
         );
 
-        console.log("Simulation complete, saving results...", { scenarioResults: scenarioResults.length });
+        console.log("Simulation complete, preparing results...", { scenarioResults: scenarioResults.length });
 
+        // Update UI state first for immediate feedback
         setSimulationResults(scenarioResults);
         setOrderLogResults(orderLogs);
         setInventoryData(invData || []);
@@ -576,26 +578,47 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           setSelectedTripScenario(scenarioResults[0].scenarioDescription || "all");
         }
         
-        // Mark scenario as completed and save results
-        if (currentScenario && updateScenario && saveScenarioOutput) {
-          await saveScenarioOutput(currentScenario.id, { 
-            scenarioResults, 
-            orderLogs, 
-            inventoryData: invData, 
-            productionLogs, 
-            productFlowLogs, 
-            tripLogs 
-          });
-          await updateScenario(currentScenario.id, { status: 'completed' });
-          console.log("Results saved to database for scenario:", currentScenario.id);
-        }
-        
+        // Show completion toast immediately
         toast.success("Simulation completed!", {
           description: `${scenarioResults.length} scenarios analyzed with ${replications} replications each`,
         });
         
-        // Auto-navigate to results
+        // Auto-navigate to results immediately
         setActiveTab("results");
+        setIsSimulating(false);
+        setSimulationProgress(0);
+        
+        // Save to database in background
+        if (currentScenario && updateScenario && saveScenarioOutput) {
+          setIsSaving(true);
+          toast.info("Saving results to database...", {
+            description: "Your results are being saved for future access",
+          });
+          
+          try {
+            await saveScenarioOutput(currentScenario.id, { 
+              scenarioResults, 
+              orderLogs, 
+              inventoryData: invData, 
+              productionLogs, 
+              productFlowLogs, 
+              tripLogs 
+            });
+            await updateScenario(currentScenario.id, { status: 'completed' });
+            console.log("Results saved to database for scenario:", currentScenario.id);
+            
+            toast.success("Results saved successfully!", {
+              description: "Your scenario results are now stored in the database",
+            });
+          } catch (saveError) {
+            console.error("Error saving results:", saveError);
+            toast.error("Failed to save results", {
+              description: "Results are available in this session but may not persist",
+            });
+          } finally {
+            setIsSaving(false);
+          }
+        }
       } else {
         // Back-compat fallback — old engine (no order logs)
         const results = await sim.runSimulation(
@@ -621,23 +644,36 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
           }
         );
 
+        // Update UI state first
         setSimulationResults(results);
         setOrderLogResults([]);
         
-        // Save results and mark completed
-        if (currentScenario && updateScenario && saveScenarioOutput) {
-          await saveScenarioOutput(currentScenario.id, { 
-            scenarioResults: results 
-          });
-          await updateScenario(currentScenario.id, { status: 'completed' });
-        }
-        
+        // Show completion and navigate immediately
         toast.success("Simulation completed!", {
           description: `${results.length} scenarios analyzed with ${replications} replications each`,
         });
-        
-        // Auto-navigate to results
         setActiveTab("results");
+        setIsSimulating(false);
+        setSimulationProgress(0);
+        
+        // Save results in background
+        if (currentScenario && updateScenario && saveScenarioOutput) {
+          setIsSaving(true);
+          toast.info("Saving results to database...");
+          
+          try {
+            await saveScenarioOutput(currentScenario.id, { 
+              scenarioResults: results 
+            });
+            await updateScenario(currentScenario.id, { status: 'completed' });
+            toast.success("Results saved successfully!");
+          } catch (saveError) {
+            console.error("Error saving results:", saveError);
+            toast.error("Failed to save results");
+          } finally {
+            setIsSaving(false);
+          }
+        }
       }
     } catch (error) {
       console.error("Simulation error:", error);
@@ -648,8 +684,11 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         await updateScenario(currentScenario.id, { status: 'failed' });
       }
     } finally {
-      setIsSimulating(false);
-      setSimulationProgress(0);
+      // Only reset if not already reset in success path
+      if (isSimulating) {
+        setIsSimulating(false);
+        setSimulationProgress(0);
+      }
     }
   };
 
@@ -829,19 +868,40 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                   </div>
                 </div>
 
-                {isSimulating && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Simulation Progress</span>
-                      <span className="font-semibold">{simulationProgress.toFixed(0)}%</span>
+
+                {(isSimulating || isSaving) && (
+                  <div className="space-y-3 bg-primary/5 p-4 rounded-lg border border-primary/20">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <span className="text-sm font-medium text-foreground">
+                          {isSimulating ? "Running Simulation..." : "Saving Results to Database..."}
+                        </span>
+                        {isSimulating && (
+                          <p className="text-xs text-muted-foreground">
+                            Processing {totalScenarios} scenarios × {replications} replications = {totalScenarios * replications} total runs
+                          </p>
+                        )}
+                        {isSaving && (
+                          <p className="text-xs text-muted-foreground">
+                            Securely storing your results for future access
+                          </p>
+                        )}
+                      </div>
+                      <span className="font-semibold text-lg">{simulationProgress.toFixed(0)}%</span>
                     </div>
-                    <Progress value={simulationProgress} className="h-2" />
+                    {isSimulating && <Progress value={simulationProgress} className="h-2" />}
+                    {isSaving && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full"></div>
+                        <span>This may take a moment for large datasets...</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                <Button onClick={handleRunSimulation} size="lg" className="w-full md:w-auto" disabled={isSimulating}>
+                <Button onClick={handleRunSimulation} size="lg" className="w-full md:w-auto" disabled={isSimulating || isSaving}>
                   <Play className="mr-2 h-5 w-5" />
-                  {isSimulating ? "Running..." : "Run Simulation"}
+                  {isSimulating ? "Running Simulation..." : isSaving ? "Saving..." : "Run Simulation"}
                 </Button>
               </CardContent>
             </Card>
