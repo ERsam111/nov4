@@ -89,7 +89,9 @@ export function AppSidebar() {
       network: '/network',
       inventory: '/inventory-optimization-v2',
     };
-    navigate(routeMap[toolType] || '/dashboard');
+    const route = routeMap[toolType] || '/dashboard';
+    // Navigate with project ID in state
+    navigate(route, { state: { projectId } });
   };
 
   const handleDeleteClick = (projectId: string, e: React.MouseEvent) => {

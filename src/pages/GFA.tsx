@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play, MapPin, BarChart3, TrendingUp, Upload, Download } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Customer, DistributionCenter, OptimizationSettings, Product } from "@/types/gfa";
@@ -19,10 +19,23 @@ import { useProjects, Project } from "@/contexts/ProjectContext";
 
 const GFA = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { projects } = useProjects();
-  const { currentScenario, saveScenarioInput, saveScenarioOutput, loadScenarioInput, loadScenarioOutput, updateScenario, loadScenariosByProject } = useScenarios();
+  const { currentScenario, setCurrentScenario, saveScenarioInput, saveScenarioOutput, loadScenarioInput, loadScenarioOutput, updateScenario, loadScenariosByProject } = useScenarios();
   const [activeTab, setActiveTab] = useState("input");
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
+
+  // Load project from route state if available
+  useEffect(() => {
+    const projectId = location.state?.projectId;
+    if (projectId && projects.length > 0) {
+      const project = projects.find(p => p.id === projectId);
+      if (project) {
+        setCurrentProject(project);
+        loadScenariosByProject(project.id);
+      }
+    }
+  }, [location.state, projects]);
   
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,27 +58,33 @@ const GFA = () => {
   });
 
   // Load scenario data when scenario is selected
-  const handleScenarioReady = async (scenarioId: string, projectId: string) => {
-    setActiveTab("input");
-    
-    // Load saved input data
-    const inputData = await loadScenarioInput(scenarioId);
-    if (inputData) {
-      setCustomers(inputData.customers || []);
-      setProducts(inputData.products || []);
-      setSettings(inputData.settings || settings);
-      toast.success("Scenario data loaded");
-    }
+  useEffect(() => {
+    const loadScenarioData = async () => {
+      if (currentScenario) {
+        // Load saved input data
+        const inputData = await loadScenarioInput(currentScenario.id);
+        if (inputData) {
+          setCustomers(inputData.customers || []);
+          setProducts(inputData.products || []);
+          setSettings(inputData.settings || settings);
+        }
 
-    // Load saved output data
-    const outputData = await loadScenarioOutput(scenarioId);
-    if (outputData) {
-      setDcs(outputData.dcs || []);
-      setFeasible(outputData.feasible ?? true);
-      setWarnings(outputData.warnings || []);
-      setCostBreakdown(outputData.costBreakdown);
-    }
-  };
+        // Load saved output data
+        const outputData = await loadScenarioOutput(currentScenario.id);
+        if (outputData) {
+          setDcs(outputData.dcs || []);
+          setFeasible(outputData.feasible ?? true);
+          setWarnings(outputData.warnings || []);
+          setCostBreakdown(outputData.costBreakdown);
+          if (outputData.dcs?.length > 0) {
+            setActiveTab("results");
+          }
+        }
+      }
+    };
+    
+    loadScenarioData();
+  }, [currentScenario?.id]);
 
   // Save input data whenever it changes
   useEffect(() => {
@@ -217,10 +236,11 @@ const GFA = () => {
         moduleName="Green Field Analysis"
         onProjectChange={(project) => {
           setCurrentProject(project);
+          setCurrentScenario(null);
           loadScenariosByProject(project.id);
         }}
-        onScenarioChange={async (scenario) => {
-          await handleScenarioReady(scenario.id, scenario.project_id);
+        onScenarioChange={(scenario) => {
+          setCurrentScenario(scenario);
         }}
       />
 

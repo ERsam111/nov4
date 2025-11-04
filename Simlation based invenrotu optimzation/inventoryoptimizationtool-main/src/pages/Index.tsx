@@ -84,19 +84,38 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
 
   // Load saved scenario data when scenario changes
   useEffect(() => {
-    if (currentScenario && loadScenarioOutput) {
-      loadScenarioOutput(currentScenario.id).then((data: any) => {
-        if (data?.scenarioResults) {
-          // Load existing results
-          setSimulationResults(data.scenarioResults);
-          setOrderLogResults(data.orderLogs || []);
-          setInventoryData(data.inventoryData || []);
-          setProductionLogResults(data.productionLogs || []);
-          setProductFlowLogResults(data.productFlowLogs || []);
-          setTripLogResults(data.tripLogs || []);
-          setActiveTab("results");
-        } else {
-          // Clear results for new scenario
+    const loadScenarioData = async () => {
+      if (currentScenario && loadScenarioOutput) {
+        try {
+          const data = await loadScenarioOutput(currentScenario.id);
+          if (data?.scenarioResults) {
+            // Load existing results
+            setSimulationResults(data.scenarioResults || []);
+            setOrderLogResults(data.orderLogs || []);
+            setInventoryData(data.inventoryData || []);
+            setProductionLogResults(data.productionLogs || []);
+            setProductFlowLogResults(data.productFlowLogs || []);
+            setTripLogResults(data.tripLogs || []);
+            setSimulationProgress(0);
+            setIsSimulating(false);
+            setActiveTab("results");
+            console.log("Loaded scenario results:", data.scenarioResults.length);
+          } else {
+            // Clear results for new scenario
+            setSimulationResults([]);
+            setOrderLogResults([]);
+            setInventoryData([]);
+            setProductionLogResults([]);
+            setProductFlowLogResults([]);
+            setTripLogResults([]);
+            setSimulationProgress(0);
+            setIsSimulating(false);
+            setActiveTab("input");
+            console.log("No results for this scenario");
+          }
+        } catch (error) {
+          console.error("Error loading scenario data:", error);
+          // Clear on error
           setSimulationResults([]);
           setOrderLogResults([]);
           setInventoryData([]);
@@ -107,19 +126,21 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
           setIsSimulating(false);
           setActiveTab("input");
         }
-      });
-    } else {
-      // Clear when no scenario is selected
-      setSimulationResults([]);
-      setOrderLogResults([]);
-      setInventoryData([]);
-      setProductionLogResults([]);
-      setProductFlowLogResults([]);
-      setTripLogResults([]);
-      setSimulationProgress(0);
-      setIsSimulating(false);
-    }
-  }, [currentScenario]);
+      } else {
+        // Clear when no scenario is selected
+        setSimulationResults([]);
+        setOrderLogResults([]);
+        setInventoryData([]);
+        setProductionLogResults([]);
+        setProductFlowLogResults([]);
+        setTripLogResults([]);
+        setSimulationProgress(0);
+        setIsSimulating(false);
+      }
+    };
+    
+    loadScenarioData();
+  }, [currentScenario?.id]);
 
   const tables = [
     { 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, FolderOpen, GitBranch, Plus } from "lucide-react";
+import { ChevronDown, FolderOpen, GitBranch, Plus, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,16 @@ import { useProjects, Project } from "@/contexts/ProjectContext";
 import { useScenarios, Scenario } from "@/contexts/ScenarioContext";
 import { CreateProjectDialog } from "./CreateProjectDialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,12 +46,14 @@ export const ProjectScenarioNav = ({
   onScenarioChange,
 }: ProjectScenarioNavProps) => {
   const { projects } = useProjects();
-  const { scenarios, loadScenariosByProject, createScenario, setCurrentScenario, currentScenario } = useScenarios();
+  const { scenarios, loadScenariosByProject, createScenario, deleteScenario, setCurrentScenario, currentScenario } = useScenarios();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [createProjectOpen, setCreateProjectOpen] = useState(false);
   const [createScenarioOpen, setCreateScenarioOpen] = useState(false);
   const [scenarioName, setScenarioName] = useState("");
   const [scenarioDescription, setScenarioDescription] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [scenarioToDelete, setScenarioToDelete] = useState<string | null>(null);
 
   // Filter projects by module type
   const moduleProjects = projects.filter(p => p.tool_type === moduleType);
@@ -68,9 +80,21 @@ export const ProjectScenarioNav = ({
 
   const handleProjectSelect = (project: Project) => {
     setSelectedProject(project);
+    setCurrentScenario(null);
     loadScenariosByProject(project.id);
     onProjectChange?.(project);
-    setCurrentScenario(null);
+  };
+
+  const handleDeleteScenario = async () => {
+    if (scenarioToDelete) {
+      await deleteScenario(scenarioToDelete);
+      toast.success("Scenario deleted successfully");
+      if (currentScenario?.id === scenarioToDelete) {
+        setCurrentScenario(null);
+      }
+      setScenarioToDelete(null);
+      setDeleteDialogOpen(false);
+    }
   };
 
   const handleScenarioSelect = (scenario: Scenario) => {
@@ -212,9 +236,21 @@ export const ProjectScenarioNav = ({
                             <span className="text-xs text-muted-foreground truncate">{scenario.description}</span>
                           )}
                         </div>
-                        <Badge variant="secondary" className={`${getStatusColor(scenario.status)} text-xs shrink-0`}>
-                          {scenario.status}
-                        </Badge>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Badge variant="secondary" className={`${getStatusColor(scenario.status)} text-xs`}>
+                            {scenario.status}
+                          </Badge>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setScenarioToDelete(scenario.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                            className="p-1 hover:bg-destructive/10 rounded"
+                          >
+                            <Trash2 className="h-3 w-3 text-destructive" />
+                          </button>
+                        </div>
                       </div>
                     </DropdownMenuItem>
                   ))
@@ -281,6 +317,24 @@ export const ProjectScenarioNav = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Scenario Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Scenario</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this scenario? This action cannot be undone and will delete all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteScenario} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete Scenario
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
