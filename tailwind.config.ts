@@ -57,6 +57,26 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        gfa: {
+          DEFAULT: "hsl(var(--gfa-teal))",
+          light: "hsl(var(--gfa-teal-light))",
+        },
+        forecasting: {
+          DEFAULT: "hsl(var(--forecasting-purple))",
+          light: "hsl(var(--forecasting-purple-light))",
+        },
+        network: {
+          DEFAULT: "hsl(var(--network-blue))",
+          light: "hsl(var(--network-blue-light))",
+        },
+        inventory: {
+          DEFAULT: "hsl(var(--inventory-orange))",
+          light: "hsl(var(--inventory-orange-light))",
+        },
+        transport: {
+          DEFAULT: "hsl(var(--transport-indigo))",
+          light: "hsl(var(--transport-indigo-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

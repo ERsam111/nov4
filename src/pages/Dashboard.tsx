@@ -13,6 +13,8 @@ const tools = [
     description: 'Green Field Analysis',
     route: '/gfa',
     type: 'gfa' as const,
+    color: 'gfa',
+    gradient: 'var(--gradient-gfa)',
   },
   {
     icon: TrendingUp,
@@ -20,6 +22,8 @@ const tools = [
     description: 'Predictive Analytics',
     route: '/demand-forecasting',
     type: 'forecasting' as const,
+    color: 'forecasting',
+    gradient: 'var(--gradient-forecasting)',
   },
   {
     icon: Network,
@@ -27,6 +31,8 @@ const tools = [
     description: 'Supply Chain Optimization',
     route: '/network',
     type: 'network' as const,
+    color: 'network',
+    gradient: 'var(--gradient-network)',
     comingSoon: true,
   },
   {
@@ -35,6 +41,8 @@ const tools = [
     description: 'Monte Carlo Optimization',
     route: '/inventory-optimization-v2',
     type: 'inventory' as const,
+    color: 'inventory',
+    gradient: 'var(--gradient-inventory)',
   },
   {
     icon: Truck,
@@ -42,6 +50,8 @@ const tools = [
     description: 'Route & Load Planning',
     route: '/transportation',
     type: 'transportation' as const,
+    color: 'transport',
+    gradient: 'var(--gradient-transport)',
     comingSoon: true,
   },
 ];
@@ -62,11 +72,11 @@ const Dashboard = () => {
     <div className="min-h-full bg-gradient-to-br from-background via-background to-primary/5">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gfa/10 via-forecasting/10 to-inventory/10 animate-gradient" />
         <div className="relative px-6 py-12 md:py-16">
           <div className="max-w-7xl mx-auto">
             <div className="text-center space-y-4 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting via-network to-inventory bg-clip-text text-transparent animate-gradient">
                 Supply Chain Optimization Suite
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -93,24 +103,30 @@ const Dashboard = () => {
                 className={`group relative overflow-hidden border-2 transition-all duration-300 animate-fade-in ${
                   tool.comingSoon 
                     ? 'opacity-75 cursor-not-allowed border-muted' 
-                    : 'hover:shadow-2xl hover:border-primary/50 hover:-translate-y-1 cursor-pointer border-border'
+                    : `hover:shadow-2xl hover:border-${tool.color} hover:-translate-y-1 cursor-pointer border-border`
                 }`}
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleToolClick(tool)}
               >
                 {/* Gradient Overlay */}
                 {!tool.comingSoon && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                    style={{ background: `linear-gradient(135deg, hsl(var(--${tool.color}-teal-light) / 0.3), transparent)` }}
+                  />
                 )}
                 
                 <CardHeader className="relative z-10 pb-4">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`h-14 w-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                      tool.comingSoon 
-                        ? 'bg-muted' 
-                        : 'bg-gradient-to-br from-primary/20 to-accent/20 group-hover:scale-110 group-hover:shadow-lg'
-                    }`}>
-                      <Icon className={`h-7 w-7 ${tool.comingSoon ? 'text-muted-foreground' : 'text-primary'}`} />
+                    <div 
+                      className={`h-14 w-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        tool.comingSoon 
+                          ? 'bg-muted' 
+                          : `bg-${tool.color}-light group-hover:scale-110 group-hover:shadow-lg`
+                      }`}
+                      style={!tool.comingSoon ? { background: tool.gradient, opacity: 0.2 } : undefined}
+                    >
+                      <Icon className={`h-7 w-7 ${tool.comingSoon ? 'text-muted-foreground' : `text-${tool.color}`}`} style={!tool.comingSoon ? { color: `hsl(var(--${tool.color}))` } : undefined} />
                     </div>
                     {tool.comingSoon && (
                       <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
@@ -119,7 +135,7 @@ const Dashboard = () => {
                     )}
                   </div>
                   
-                  <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">
+                  <CardTitle className={`text-xl mb-2 transition-colors ${tool.comingSoon ? '' : `group-hover:text-${tool.color}`}`} style={!tool.comingSoon ? { } : undefined}>
                     {tool.title}
                   </CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
@@ -133,8 +149,9 @@ const Dashboard = () => {
                     className={`w-full transition-all duration-300 ${
                       tool.comingSoon 
                         ? 'cursor-not-allowed' 
-                        : 'bg-primary hover:bg-primary/90 group-hover:shadow-md'
+                        : `group-hover:shadow-md`
                     }`}
+                    style={!tool.comingSoon ? { background: tool.gradient } : undefined}
                     disabled={tool.comingSoon}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -144,7 +161,10 @@ const Dashboard = () => {
 
                 {/* Bottom border accent */}
                 {!tool.comingSoon && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                  <div 
+                    className="absolute bottom-0 left-0 right-0 h-1 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" 
+                    style={{ background: tool.gradient }}
+                  />
                 )}
               </Card>
             );
