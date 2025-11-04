@@ -35,6 +35,7 @@ import {
   bomColumns, bomDataInitial,
 } from "../data/allTables";
 import { downloadTemplate, exportResultsToExcel, importFromExcel } from "../utils/excelExport";
+import { compressData, decompressData, formatBytes } from "../utils/dataCompression";
 
 const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenarioInput, loadScenarioOutput }: any) => {
   const [replications, setReplications] = useState(10);
@@ -47,7 +48,6 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   const [selectedTable, setSelectedTable] = useState<string>("customers");
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("input");
   
   // Filters for inventory graph and order log
@@ -87,20 +87,49 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
   useEffect(() => {
     const loadScenarioData = async () => {
       if (currentScenario && loadScenarioOutput) {
+        const startLoadTime = performance.now();
+        toast.info("Loading saved results...", { duration: 60000 });
+        
         try {
-          const data = await loadScenarioOutput(currentScenario.id);
-          if (data?.scenarioResults) {
-            // Load existing results
-            setSimulationResults(data.scenarioResults || []);
-            setOrderLogResults(data.orderLogs || []);
-            setInventoryData(data.inventoryData || []);
-            setProductionLogResults(data.productionLogs || []);
-            setProductFlowLogResults(data.productFlowLogs || []);
-            setTripLogResults(data.tripLogs || []);
-            setSimulationProgress(0);
-            setIsSimulating(false);
-            setActiveTab("results");
-            console.log("Loaded scenario results:", data.scenarioResults.length);
+          const savedData = await loadScenarioOutput(currentScenario.id);
+          
+          if (savedData) {
+            // Check if data is compressed
+            let data = savedData;
+            if (savedData.isCompressed && savedData.compressed) {
+              const compressedSize = new Blob([savedData.compressed]).size;
+              toast.info(`Decompressing data (${formatBytes(compressedSize)})...`);
+              
+              data = decompressData(savedData.compressed);
+              const loadTime = ((performance.now() - startLoadTime) / 1000).toFixed(2);
+              toast.success(`Results loaded in ${loadTime}s`);
+            }
+            
+            if (data?.scenarioResults || data?.orderLogs) {
+              // Load existing results
+              setSimulationResults(data.scenarioResults || []);
+              setOrderLogResults(data.orderLogs || []);
+              setInventoryData(data.inventoryData || []);
+              setProductionLogResults(data.productionLogs || []);
+              setProductFlowLogResults(data.productFlowLogs || []);
+              setTripLogResults(data.tripLogs || []);
+              setSimulationProgress(0);
+              setIsSimulating(false);
+              setActiveTab("results");
+              console.log("Loaded scenario results:", data.scenarioResults?.length || 0);
+            } else {
+              // Clear results for new scenario
+              setSimulationResults([]);
+              setOrderLogResults([]);
+              setInventoryData([]);
+              setProductionLogResults([]);
+              setProductFlowLogResults([]);
+              setTripLogResults([]);
+              setSimulationProgress(0);
+              setIsSimulating(false);
+              setActiveTab("input");
+              console.log("No results for this scenario");
+            }
           } else {
             // Clear results for new scenario
             setSimulationResults([]);
@@ -112,10 +141,12 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
             setSimulationProgress(0);
             setIsSimulating(false);
             setActiveTab("input");
-            console.log("No results for this scenario");
           }
         } catch (error) {
           console.error("Error loading scenario data:", error);
+          toast.error("Failed to load results", {
+            description: error instanceof Error ? error.message : "Unknown error"
+          });
           // Clear on error
           setSimulationResults([]);
           setOrderLogResults([]);
@@ -509,8 +540,10 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
       await updateScenario(currentScenario.id, { status: 'running' });
     }
 
-    // Save input data before running simulation
+    // Save input data before running simulation with compression
     if (currentScenario && saveScenarioInput) {
+      const startSaveTime = performance.now();
+      
       const inputData = {
         customerData,
         facilityData,
@@ -528,8 +561,22 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         replications,
       };
       
-      // Save to scenario_inputs table with background save (non-blocking)
-      await saveScenarioInput(currentScenario.id, inputData, true);
+      const originalSize = new Blob([JSON.stringify(inputData)]).size;
+      toast.info(`Compressing input data (${formatBytes(originalSize)})...`);
+      
+      try {
+        const compressed = compressData(inputData);
+        const compressedSize = new Blob([compressed]).size;
+        const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+        
+        await saveScenarioInput(currentScenario.id, { compressed, isCompressed: true }, true);
+        
+        const saveTime = ((performance.now() - startSaveTime) / 1000).toFixed(2);
+        toast.success(`Input saved: ${formatBytes(compressedSize)} (${ratio}% smaller) in ${saveTime}s`);
+      } catch (error) {
+        console.error("Input save error:", error);
+        toast.warning("Input save failed, continuing simulation");
+      }
     }
 
     try {
@@ -591,6 +638,49 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         // Update scenario status immediately (mark as completed)
         if (currentScenario && updateScenario) {
           updateScenario(currentScenario.id, { status: 'completed' }).catch(console.error);
+        }
+
+        // Auto-save output data with compression (non-blocking)
+        if (currentScenario && saveScenarioOutput) {
+          const startSaveTime = performance.now();
+          toast.info("Compressing & saving results...", { duration: 60000 });
+          
+          setTimeout(async () => {
+            try {
+              const outputData = {
+                scenarioResults,
+                orderLogs,
+                inventoryData: invData || [],
+                productionLogs: productionLogs || [],
+                productFlowLogs: productFlowLogs || [],
+                tripLogs: tripLogs || [],
+                metadata: {
+                  totalScenarios: scenarioResults.length,
+                  totalOrders: orderLogs.length,
+                  totalTrips: tripLogs.length,
+                  totalProduction: productionLogs?.length || 0,
+                  totalProductFlow: productFlowLogs?.length || 0,
+                  replications,
+                  completedAt: new Date().toISOString()
+                }
+              };
+              
+              const originalSize = new Blob([JSON.stringify(outputData)]).size;
+              const compressed = compressData(outputData);
+              const compressedSize = new Blob([compressed]).size;
+              const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+              
+              await saveScenarioOutput(currentScenario.id, { compressed, isCompressed: true }, true);
+              
+              const saveTime = ((performance.now() - startSaveTime) / 1000).toFixed(2);
+              toast.success(`Results saved: ${formatBytes(compressedSize)} (${ratio}% smaller) in ${saveTime}s`);
+            } catch (error) {
+              console.error("Auto-save error:", error);
+              toast.error("Failed to save results", {
+                description: error instanceof Error ? error.message : "Unknown error"
+              });
+            }
+          }, 100); // Delay 100ms to not block UI update
         }
       } else {
         // Back-compat fallback — old engine (no order logs)
@@ -819,39 +909,26 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                 </div>
 
 
-                {(isSimulating || isSaving) && (
+                {isSimulating && (
                   <div className="space-y-3 bg-primary/5 p-4 rounded-lg border border-primary/20">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-foreground">
-                          {isSimulating ? "Running Simulation..." : "Saving Results to Database..."}
+                          Running Simulation...
                         </span>
-                        {isSimulating && (
-                          <p className="text-xs text-muted-foreground">
-                            Processing {totalScenarios} scenarios × {replications} replications = {totalScenarios * replications} total runs
-                          </p>
-                        )}
-                        {isSaving && (
-                          <p className="text-xs text-muted-foreground">
-                            Securely storing your results for future access
-                          </p>
-                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Processing {totalScenarios} scenarios × {replications} replications = {totalScenarios * replications} total runs
+                        </p>
                       </div>
                       <span className="font-semibold text-lg">{simulationProgress.toFixed(0)}%</span>
                     </div>
-                    {isSimulating && <Progress value={simulationProgress} className="h-2" />}
-                    {isSaving && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full"></div>
-                        <span>This may take a moment for large datasets...</span>
-                      </div>
-                    )}
+                    <Progress value={simulationProgress} className="h-2" />
                   </div>
                 )}
 
-                <Button onClick={handleRunSimulation} size="lg" className="w-full md:w-auto" disabled={isSimulating || isSaving}>
+                <Button onClick={handleRunSimulation} size="lg" className="w-full md:w-auto" disabled={isSimulating}>
                   <Play className="mr-2 h-5 w-5" />
-                  {isSimulating ? "Running Simulation..." : isSaving ? "Saving..." : "Run Simulation"}
+                  {isSimulating ? "Running Simulation..." : "Run Simulation"}
                 </Button>
               </CardContent>
             </Card>
@@ -996,46 +1073,6 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                   </div>
                    {simulationResults.length > 0 && (
                     <div className="flex gap-2">
-                      <Button
-                        onClick={async () => {
-                          if (!currentScenario || !saveScenarioOutput) return;
-                          
-                          setIsSaving(true);
-                          try {
-                            // Only save summary results and limited logs to avoid payload size issues
-                            const summaryData = {
-                              scenarioResults: simulationResults,
-                              orderLogs: orderLogResults.slice(0, 100), // Limit to first 100 orders
-                              inventoryData: inventoryData ? Object.keys(inventoryData).reduce((acc, key) => {
-                                acc[key] = inventoryData[key].slice(0, 50); // Limit inventory snapshots
-                                return acc;
-                              }, {} as any) : {},
-                              tripLogs: tripLogResults.slice(0, 50), // Limit trip logs
-                              totalRecords: {
-                                orders: orderLogResults.length,
-                                trips: tripLogResults.length,
-                                production: productionLogResults.length,
-                                productFlow: productFlowLogResults.length
-                              }
-                            };
-                            
-                            await saveScenarioOutput(currentScenario.id, summaryData, true);
-                            toast.success("Results saved to database successfully!");
-                          } catch (error) {
-                            console.error("Error saving results:", error);
-                            toast.error("Failed to save results to database", {
-                              description: "Please try again or reduce data size",
-                            });
-                          } finally {
-                            setIsSaving(false);
-                          }
-                        }}
-                        className="flex items-center gap-2"
-                        disabled={isSaving}
-                      >
-                        <Database className="h-4 w-4" />
-                        {isSaving ? "Saving..." : "Save to Database"}
-                      </Button>
                       <Button
                         onClick={() => {
                           exportResultsToExcel(
