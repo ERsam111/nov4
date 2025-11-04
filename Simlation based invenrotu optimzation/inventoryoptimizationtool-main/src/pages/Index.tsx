@@ -588,48 +588,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         setIsSimulating(false);
         setSimulationProgress(0);
         
-        // Update scenario status immediately
+        // Update scenario status immediately (mark as completed)
         if (currentScenario && updateScenario) {
           updateScenario(currentScenario.id, { status: 'completed' }).catch(console.error);
-        }
-        
-        // Save to database in background (non-blocking, with data compression)
-        if (currentScenario && saveScenarioOutput) {
-          setIsSaving(true);
-          
-          // Use background save to avoid blocking UI
-          (async () => {
-            try {
-              // Only save summary results and limited logs to avoid payload size issues
-              const summaryData = {
-                scenarioResults, // Keep full scenario results (this is the important summary data)
-                orderLogs: orderLogs.slice(0, 100), // Limit to first 100 orders
-                inventoryData: invData ? Object.keys(invData).reduce((acc, key) => {
-                  acc[key] = invData[key].slice(0, 50); // Limit inventory snapshots
-                  return acc;
-                }, {} as any) : {},
-                tripLogs: tripLogs.slice(0, 50), // Limit trip logs
-                totalRecords: {
-                  orders: orderLogs.length,
-                  trips: tripLogs.length,
-                  production: productionLogs.length,
-                  productFlow: productFlowLogs.length
-                }
-              };
-              
-              await saveScenarioOutput(currentScenario.id, summaryData, true);
-              console.log("Results saved to database for scenario:", currentScenario.id);
-              
-              toast.success("Results saved successfully!");
-            } catch (saveError) {
-              console.error("Error saving results:", saveError);
-              toast.warning("Results displayed but not saved to database", {
-                description: "Results are available in this session",
-              });
-            } finally {
-              setIsSaving(false);
-            }
-          })();
         }
       } else {
         // Back-compat fallback — old engine (no order logs)
@@ -668,23 +629,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         setIsSimulating(false);
         setSimulationProgress(0);
         
-        // Save results in background
-        if (currentScenario && updateScenario && saveScenarioOutput) {
-          setIsSaving(true);
-          toast.info("Saving results to database...");
-          
-          try {
-            await saveScenarioOutput(currentScenario.id, { 
-              scenarioResults: results 
-            });
-            await updateScenario(currentScenario.id, { status: 'completed' });
-            toast.success("Results saved successfully!");
-          } catch (saveError) {
-            console.error("Error saving results:", saveError);
-            toast.error("Failed to save results");
-          } finally {
-            setIsSaving(false);
-          }
+        // Update scenario status immediately
+        if (currentScenario && updateScenario) {
+          updateScenario(currentScenario.id, { status: 'completed' }).catch(console.error);
         }
       }
     } catch (error) {
@@ -1056,22 +1003,65 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
                         : "No simulation results yet. Run a simulation to see results here."}
                     </CardDescription>
                   </div>
-                  {simulationResults.length > 0 && (
-                    <Button
-                      onClick={() => {
-                        exportResultsToExcel(
-                          simulationResults,
-                          orderLogResults,
-                          inventoryData,
-                          replications
-                        );
-                        toast.success("Results exported to Excel successfully!");
-                      }}
-                      className="flex items-center gap-2"
-                    >
-                      <FileSpreadsheet className="h-4 w-4" />
-                      Export to Excel
-                    </Button>
+                   {simulationResults.length > 0 && (
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={async () => {
+                          if (!currentScenario || !saveScenarioOutput) return;
+                          
+                          setIsSaving(true);
+                          try {
+                            // Only save summary results and limited logs to avoid payload size issues
+                            const summaryData = {
+                              scenarioResults: simulationResults,
+                              orderLogs: orderLogResults.slice(0, 100), // Limit to first 100 orders
+                              inventoryData: inventoryData ? Object.keys(inventoryData).reduce((acc, key) => {
+                                acc[key] = inventoryData[key].slice(0, 50); // Limit inventory snapshots
+                                return acc;
+                              }, {} as any) : {},
+                              tripLogs: tripLogResults.slice(0, 50), // Limit trip logs
+                              totalRecords: {
+                                orders: orderLogResults.length,
+                                trips: tripLogResults.length,
+                                production: productionLogResults.length,
+                                productFlow: productFlowLogResults.length
+                              }
+                            };
+                            
+                            await saveScenarioOutput(currentScenario.id, summaryData, true);
+                            toast.success("Results saved to database successfully!");
+                          } catch (error) {
+                            console.error("Error saving results:", error);
+                            toast.error("Failed to save results to database", {
+                              description: "Please try again or reduce data size",
+                            });
+                          } finally {
+                            setIsSaving(false);
+                          }
+                        }}
+                        className="flex items-center gap-2"
+                        disabled={isSaving}
+                      >
+                        <Database className="h-4 w-4" />
+                        {isSaving ? "Saving..." : "Save to Database"}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          exportResultsToExcel(
+                            simulationResults,
+                            orderLogResults,
+                            inventoryData,
+                            replications
+                          );
+                          toast.success("Results exported to Excel successfully!");
+                        }}
+                        className="flex items-center gap-2"
+                        variant="outline"
+                      >
+                        <FileSpreadsheet className="h-4 w-4" />
+                        Export to Excel
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardHeader>
