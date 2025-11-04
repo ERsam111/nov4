@@ -191,12 +191,12 @@ export function AppSidebar() {
                               </div>
                               <DropdownMenu>
                                 <DropdownMenuTrigger 
-                                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-accent-foreground/10 rounded"
+                                  className="opacity-100 ml-2 p-1 hover:bg-accent-foreground/10 rounded"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent align="end" className="z-50">
                                   <DropdownMenuItem
                                     className="text-destructive focus:text-destructive"
                                     onClick={(e) => handleDeleteClick(project.id, e)}

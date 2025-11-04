@@ -87,6 +87,7 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
     if (currentScenario && loadScenarioOutput) {
       loadScenarioOutput(currentScenario.id).then((data: any) => {
         if (data?.scenarioResults) {
+          // Load existing results
           setSimulationResults(data.scenarioResults);
           setOrderLogResults(data.orderLogs || []);
           setInventoryData(data.inventoryData || []);
@@ -94,8 +95,29 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
           setProductFlowLogResults(data.productFlowLogs || []);
           setTripLogResults(data.tripLogs || []);
           setActiveTab("results");
+        } else {
+          // Clear results for new scenario
+          setSimulationResults([]);
+          setOrderLogResults([]);
+          setInventoryData([]);
+          setProductionLogResults([]);
+          setProductFlowLogResults([]);
+          setTripLogResults([]);
+          setSimulationProgress(0);
+          setIsSimulating(false);
+          setActiveTab("input");
         }
       });
+    } else {
+      // Clear when no scenario is selected
+      setSimulationResults([]);
+      setOrderLogResults([]);
+      setInventoryData([]);
+      setProductionLogResults([]);
+      setProductFlowLogResults([]);
+      setTripLogResults([]);
+      setSimulationProgress(0);
+      setIsSimulating(false);
     }
   }, [currentScenario]);
 
