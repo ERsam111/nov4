@@ -1191,21 +1191,29 @@ function calculateStats(values: number[]): { min: number; max: number; mean: num
   return { min, max, mean, sd: Math.sqrt(variance) };
 }
 
+
+// Helper function to yield control to the browser
+function yieldToMain(): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, 0);
+  });
+}
+
 // ================== Shared runner ==================
-function runAll(
+async function runAll(
   input: SimulationInput,
   replications: number,
   onProgress?: (progress: number) => void,
   collectLogs: boolean = false,
   collectInventory: boolean = false
-): { 
+): Promise<{ 
   scenarioResults: SimulationResult[]; 
   orderLogs: OrderLog[]; 
   inventoryData: InventorySnapshot[];
   productionLogs: ProductionLog[];
   productFlowLogs: ProductFlowLog[];
   tripLogs: TripLog[];
-} {
+}> {
   const scenarios = generateScenarios(input);
   const scenarioResults: SimulationResult[] = [];
   const allOrderLogs: OrderLog[] = [];
@@ -1213,6 +1221,8 @@ function runAll(
   const allProductionLogs: ProductionLog[] = [];
   const allProductFlowLogs: ProductFlowLog[] = [];
   const allTripLogs: TripLog[] = [];
+
+  const BATCH_SIZE = 5; // Process scenarios in batches to allow UI updates
 
   for (let i = 0; i < scenarios.length; i++) {
     const sc = scenarios[i];
@@ -1237,6 +1247,9 @@ function runAll(
     let handlingDetailsForScenario: HandlingDetails | undefined;
     let inventoryDetailsForScenario: InventoryDetails | undefined;
 
+    // Process replications in batches to avoid blocking
+    const REP_BATCH_SIZE = Math.max(1, Math.floor(10 / Math.max(1, scenarios.length / 10)));
+    
     for (let rep = 0; rep < replications; rep++) {
       const { cost, serviceLevel, eltServiceLevel, orderLog, costBreakdown, transportationDetails, productionDetails, handlingDetails, inventoryDetails, inventorySnapshots, productionLog, productFlowLog, tripLog } = 
         runReplication(input, sc, rep + 1, collectInventory, desc);
@@ -1271,6 +1284,11 @@ function runAll(
 
       if (collectInventory && rep < 3) { // Only collect first 3 replications for performance
         allInventoryData.push(...inventorySnapshots);
+      }
+      
+      // Yield after every batch of replications to prevent UI blocking
+      if ((rep + 1) % REP_BATCH_SIZE === 0) {
+        await yieldToMain();
       }
     }
 
@@ -1312,6 +1330,11 @@ function runAll(
     });
 
     if (onProgress) onProgress(((i + 1) / scenarios.length) * 100);
+    
+    // Yield after every batch of scenarios to prevent UI blocking
+    if ((i + 1) % BATCH_SIZE === 0) {
+      await yieldToMain();
+    }
   }
 
   return { 
@@ -1331,7 +1354,7 @@ export async function runSimulation(
   replications: number,
   onProgress?: (progress: number) => void
 ): Promise<SimulationResult[]> {
-  const { scenarioResults } = runAll(input, replications, onProgress, false, false);
+  const { scenarioResults } = await runAll(input, replications, onProgress, false, false);
   return scenarioResults;
 }
 
@@ -1341,5 +1364,5 @@ export async function runSimulationWithLogs(
   replications: number,
   onProgress?: (progress: number) => void
 ): Promise<{ scenarioResults: SimulationResult[]; orderLogs: OrderLog[]; inventoryData: InventorySnapshot[] }> {
-  return runAll(input, replications, onProgress, true, true);
+  return await runAll(input, replications, onProgress, true, true);
 }
