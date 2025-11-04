@@ -22,7 +22,7 @@ export default function InventoryOptimizationV2() {
       const project = projects.find(p => p.id === projectId);
       if (project) {
         setCurrentProject(project);
-        loadScenariosByProject(project.id);
+        loadScenariosByProject(project.id, 'inventory'); // Filter by inventory module
       }
     }
   }, [location.state, projects]);
@@ -30,7 +30,7 @@ export default function InventoryOptimizationV2() {
   const handleProjectChange = (project: Project) => {
     setCurrentProject(project);
     setCurrentScenario(null); // Clear scenario when project changes
-    loadScenariosByProject(project.id);
+    loadScenariosByProject(project.id, 'inventory'); // Filter by inventory module
   };
 
   const handleScenarioChange = (scenario: any) => {

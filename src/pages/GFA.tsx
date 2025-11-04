@@ -32,7 +32,7 @@ const GFA = () => {
       const project = projects.find(p => p.id === projectId);
       if (project) {
         setCurrentProject(project);
-        loadScenariosByProject(project.id);
+        loadScenariosByProject(project.id, 'gfa'); // Filter by GFA module
       }
     }
   }, [location.state, projects]);
@@ -94,11 +94,11 @@ const GFA = () => {
           customers,
           products,
           settings,
-        });
+        }, true); // Background save, non-blocking
       };
       saveData();
     }
-  }, [customers, products, settings]);
+  }, [customers, products, settings, currentScenario?.id]);
 
   // Extract unique products from customers
   useEffect(() => {
@@ -163,13 +163,13 @@ const GFA = () => {
     setWarnings(result.warnings);
     setCostBreakdown(result.costBreakdown);
 
-    // Save output data
-    await saveScenarioOutput(currentScenario.id, {
+    // Save output data in background (non-blocking)
+    saveScenarioOutput(currentScenario.id, {
       dcs: result.dcs,
       feasible: result.feasible,
       warnings: result.warnings,
       costBreakdown: result.costBreakdown,
-    });
+    }, true);
 
     // Update scenario status to completed
     await updateScenario(currentScenario.id, { status: 'completed' });
@@ -237,7 +237,7 @@ const GFA = () => {
         onProjectChange={(project) => {
           setCurrentProject(project);
           setCurrentScenario(null);
-          loadScenariosByProject(project.id);
+          loadScenariosByProject(project.id, 'gfa'); // Filter by GFA module
         }}
         onScenarioChange={(scenario) => {
           setCurrentScenario(scenario);

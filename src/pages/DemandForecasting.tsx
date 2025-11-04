@@ -273,7 +273,7 @@ const DemandForecasting = () => {
         moduleName="Demand Forecasting"
         onProjectChange={(project) => {
           setCurrentProject(project);
-          loadScenariosByProject(project.id);
+          loadScenariosByProject(project.id, 'forecasting'); // Filter by forecasting module
         }}
         onScenarioChange={(scenario) => {
           setCurrentScenario(scenario);

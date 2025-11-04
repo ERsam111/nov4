@@ -46,7 +46,7 @@ export default function NetworkAnalysis() {
           moduleName="Network Analysis"
           onProjectChange={(project) => {
             setCurrentProject(project);
-            loadScenariosByProject(project.id);
+            loadScenariosByProject(project.id, 'network'); // Filter by network module
           }}
           onScenarioChange={(scenario) => {
             setCurrentScenario(scenario);

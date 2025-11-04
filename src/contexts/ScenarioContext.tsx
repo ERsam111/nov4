@@ -33,13 +33,13 @@ interface ScenarioContextType {
   currentScenario: Scenario | null;
   loading: boolean;
   operationLoading: boolean;
-  loadScenariosByProject: (projectId: string) => Promise<void>;
+  loadScenariosByProject: (projectId: string, moduleType?: string) => Promise<void>;
   createScenario: (scenario: Omit<Scenario, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Scenario | null>;
   updateScenario: (id: string, updates: Partial<Scenario>) => Promise<void>;
   deleteScenario: (id: string) => Promise<void>;
   setCurrentScenario: (scenario: Scenario | null) => void;
-  saveScenarioInput: (scenarioId: string, inputData: any) => Promise<void>;
-  saveScenarioOutput: (scenarioId: string, outputData: any) => Promise<void>;
+  saveScenarioInput: (scenarioId: string, inputData: any, background?: boolean) => Promise<void>;
+  saveScenarioOutput: (scenarioId: string, outputData: any, background?: boolean) => Promise<void>;
   loadScenarioInput: (scenarioId: string) => Promise<any>;
   loadScenarioOutput: (scenarioId: string) => Promise<any>;
 }
@@ -53,15 +53,21 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
   const [operationLoading, setOperationLoading] = useState(false);
   const { user } = useAuth();
 
-  const loadScenariosByProject = async (projectId: string) => {
+  const loadScenariosByProject = async (projectId: string, moduleType?: string) => {
     if (!user) return;
 
     setLoading(true);
-    const { data, error } = await (supabase as any)
+    let query = (supabase as any)
       .from('scenarios')
       .select('*')
-      .eq('project_id', projectId)
-      .order('created_at', { ascending: false });
+      .eq('project_id', projectId);
+    
+    // Filter by module type if provided
+    if (moduleType) {
+      query = query.eq('module_type', moduleType);
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (!error && data) {
       setScenarios(data as Scenario[]);
@@ -113,20 +119,76 @@ export const ScenarioProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  const saveScenarioInput = async (scenarioId: string, inputData: any) => {
-    setOperationLoading(true);
-    await (supabase as any)
-      .from('scenario_inputs')
-      .insert([{ scenario_id: scenarioId, input_data: inputData }]);
-    setOperationLoading(false);
+  const saveScenarioInput = async (scenarioId: string, inputData: any, background: boolean = false) => {
+    if (!background) {
+      setOperationLoading(true);
+    }
+    
+    try {
+      // Use upsert to replace existing data instead of creating duplicates
+      const { data: existing } = await (supabase as any)
+        .from('scenario_inputs')
+        .select('id')
+        .eq('scenario_id', scenarioId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (existing) {
+        // Update existing record
+        await (supabase as any)
+          .from('scenario_inputs')
+          .update({ input_data: inputData })
+          .eq('id', existing.id);
+      } else {
+        // Insert new record
+        await (supabase as any)
+          .from('scenario_inputs')
+          .insert([{ scenario_id: scenarioId, input_data: inputData }]);
+      }
+    } catch (error) {
+      console.error('Error saving scenario input:', error);
+    } finally {
+      if (!background) {
+        setOperationLoading(false);
+      }
+    }
   };
 
-  const saveScenarioOutput = async (scenarioId: string, outputData: any) => {
-    setOperationLoading(true);
-    await (supabase as any)
-      .from('scenario_outputs')
-      .insert([{ scenario_id: scenarioId, output_data: outputData }]);
-    setOperationLoading(false);
+  const saveScenarioOutput = async (scenarioId: string, outputData: any, background: boolean = false) => {
+    if (!background) {
+      setOperationLoading(true);
+    }
+    
+    try {
+      // Use upsert to replace existing data instead of creating duplicates
+      const { data: existing } = await (supabase as any)
+        .from('scenario_outputs')
+        .select('id')
+        .eq('scenario_id', scenarioId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (existing) {
+        // Update existing record
+        await (supabase as any)
+          .from('scenario_outputs')
+          .update({ output_data: outputData })
+          .eq('id', existing.id);
+      } else {
+        // Insert new record
+        await (supabase as any)
+          .from('scenario_outputs')
+          .insert([{ scenario_id: scenarioId, output_data: outputData }]);
+      }
+    } catch (error) {
+      console.error('Error saving scenario output:', error);
+    } finally {
+      if (!background) {
+        setOperationLoading(false);
+      }
+    }
   };
 
   const loadScenarioInput = async (scenarioId: string) => {

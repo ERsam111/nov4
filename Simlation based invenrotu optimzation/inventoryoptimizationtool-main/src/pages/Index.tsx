@@ -528,8 +528,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         replications,
       };
       
-      // Save to scenario_inputs table
-      await saveScenarioInput(currentScenario.id, inputData);
+      // Save to scenario_inputs table with background save (non-blocking)
+      await saveScenarioInput(currentScenario.id, inputData, true);
     }
 
     try {
@@ -588,36 +588,36 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
         setIsSimulating(false);
         setSimulationProgress(0);
         
-        // Save to database in background
+        // Save to database in background (non-blocking)
         if (currentScenario && updateScenario && saveScenarioOutput) {
           setIsSaving(true);
-          toast.info("Saving results to database...", {
-            description: "Your results are being saved for future access",
-          });
           
-          try {
-            await saveScenarioOutput(currentScenario.id, { 
-              scenarioResults, 
-              orderLogs, 
-              inventoryData: invData, 
-              productionLogs, 
-              productFlowLogs, 
-              tripLogs 
-            });
-            await updateScenario(currentScenario.id, { status: 'completed' });
-            console.log("Results saved to database for scenario:", currentScenario.id);
-            
-            toast.success("Results saved successfully!", {
-              description: "Your scenario results are now stored in the database",
-            });
-          } catch (saveError) {
-            console.error("Error saving results:", saveError);
-            toast.error("Failed to save results", {
-              description: "Results are available in this session but may not persist",
-            });
-          } finally {
-            setIsSaving(false);
-          }
+          // Use background save to avoid blocking UI
+          (async () => {
+            try {
+              await saveScenarioOutput(currentScenario.id, { 
+                scenarioResults, 
+                orderLogs, 
+                inventoryData: invData, 
+                productionLogs, 
+                productFlowLogs, 
+                tripLogs 
+              }, true); // Background save
+              await updateScenario(currentScenario.id, { status: 'completed' });
+              console.log("Results saved to database for scenario:", currentScenario.id);
+              
+              toast.success("Results saved successfully!", {
+                description: "Your scenario results are now stored in the database",
+              });
+            } catch (saveError) {
+              console.error("Error saving results:", saveError);
+              toast.error("Failed to save results", {
+                description: "Results are available in this session but may not persist",
+              });
+            } finally {
+              setIsSaving(false);
+            }
+          })();
         }
       } else {
         // Back-compat fallback — old engine (no order logs)
