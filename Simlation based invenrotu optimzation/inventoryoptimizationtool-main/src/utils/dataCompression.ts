@@ -9,7 +9,14 @@ export function compressData(data: any): string {
   try {
     const jsonString = JSON.stringify(data);
     const compressed = pako.deflate(jsonString);
-    return btoa(String.fromCharCode(...compressed));
+    
+    // Convert Uint8Array to base64 without spread operator (handles large arrays)
+    let binary = '';
+    const len = compressed.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(compressed[i]);
+    }
+    return btoa(binary);
   } catch (error) {
     console.error('Compression error:', error);
     throw error;
@@ -24,8 +31,9 @@ export function compressData(data: any): string {
 export function decompressData(compressedData: string): any {
   try {
     const binaryString = atob(compressedData);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
     const decompressed = pako.inflate(bytes, { to: 'string' });
@@ -49,13 +57,17 @@ export function chunkData(data: any, chunkSizeMB: number = 5): string[] {
   
   for (let i = 0; i < jsonString.length; i += chunkSize) {
     const chunk = jsonString.slice(i, i + chunkSize);
-    chunks.push(chunk);
+    const compressed = pako.deflate(chunk);
+    
+    // Convert to base64 without spread operator
+    let binary = '';
+    for (let j = 0; j < compressed.byteLength; j++) {
+      binary += String.fromCharCode(compressed[j]);
+    }
+    chunks.push(btoa(binary));
   }
   
-  return chunks.map(chunk => {
-    const compressed = pako.deflate(chunk);
-    return btoa(String.fromCharCode(...compressed));
-  });
+  return chunks;
 }
 
 /**
@@ -66,8 +78,9 @@ export function chunkData(data: any, chunkSizeMB: number = 5): string[] {
 export function reconstructFromChunks(chunks: string[]): any {
   const decompressedChunks = chunks.map(chunk => {
     const binaryString = atob(chunk);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
     return pako.inflate(bytes, { to: 'string' });
