@@ -757,9 +757,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenar
             <div className="flex gap-4 h-[calc(100vh-250px)]">
               {/* Left Sidebar - Table Names */}
               <Card className="w-80 flex-shrink-0 flex flex-col">
-                <CardHeader className="pb-3 border-b">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Database className="h-5 w-5" />
+                <CardHeader className="pb-2 border-b">
+                  <CardTitle className="text-sm flex items-center gap-1.5">
+                    <Database className="h-4 w-4" />
                     Input Tables
                   </CardTitle>
                   <CardDescription className="text-xs">Select a table to edit</CardDescription>
