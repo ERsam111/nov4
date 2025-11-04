@@ -13,7 +13,7 @@ export default function InventoryOptimizationV2() {
   const location = useLocation();
   const { projects } = useProjects();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const { currentScenario, setCurrentScenario, loadScenariosByProject, updateScenario, saveScenarioOutput, loadScenarioOutput } = useScenarios();
+  const { currentScenario, setCurrentScenario, loadScenariosByProject, updateScenario, saveScenarioOutput, saveScenarioInput, loadScenarioOutput } = useScenarios();
 
   // Load project from route state if available
   useEffect(() => {
@@ -62,6 +62,7 @@ export default function InventoryOptimizationV2() {
           currentScenario={currentScenario}
           updateScenario={updateScenario}
           saveScenarioOutput={saveScenarioOutput}
+          saveScenarioInput={saveScenarioInput}
           loadScenarioOutput={loadScenarioOutput}
         />
       </div>

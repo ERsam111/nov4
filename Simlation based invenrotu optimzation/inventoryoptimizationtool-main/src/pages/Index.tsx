@@ -36,7 +36,7 @@ import {
 } from "../data/allTables";
 import { downloadTemplate, exportResultsToExcel, importFromExcel } from "../utils/excelExport";
 
-const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenarioOutput }: any) => {
+const Index = ({ currentScenario, updateScenario, saveScenarioOutput, saveScenarioInput, loadScenarioOutput }: any) => {
   const [replications, setReplications] = useState(10);
   const [simulationResults, setSimulationResults] = useState<any[]>([]);
   const [orderLogResults, setOrderLogResults] = useState<any[]>([]);
@@ -492,14 +492,24 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
   }, [inputFactorsData]);
 
   const handleRunSimulation = async () => {
+    if (!currentScenario) {
+      toast.error("Please select a scenario first");
+      return;
+    }
+
     setIsSimulating(true);
     setSimulationProgress(0);
     toast.info("Simulation started", {
       description: `Running ${totalScenarios} scenarios with ${replications} replications each...`,
     });
 
+    // Update scenario status to running
+    if (updateScenario) {
+      await updateScenario(currentScenario.id, { status: 'running' });
+    }
+
     // Save input data before running simulation
-    if (currentScenario && saveScenarioOutput) {
+    if (currentScenario && saveScenarioInput) {
       const inputData = {
         customerData,
         facilityData,
@@ -517,8 +527,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
         replications,
       };
       
-      // Save as input in scenario_inputs table
-      await saveScenarioOutput(currentScenario.id, { input: inputData });
+      // Save to scenario_inputs table
+      await saveScenarioInput(currentScenario.id, inputData);
     }
 
     try {
@@ -549,6 +559,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
           }
         );
 
+        console.log("Simulation complete, saving results...", { scenarioResults: scenarioResults.length });
+
         setSimulationResults(scenarioResults);
         setOrderLogResults(orderLogs);
         setInventoryData(invData || []);
@@ -564,13 +576,8 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
           setSelectedTripScenario(scenarioResults[0].scenarioDescription || "all");
         }
         
-        toast.success("Simulation completed!", {
-          description: `${scenarioResults.length} scenarios analyzed with ${replications} replications each`,
-        });
-        
         // Mark scenario as completed and save results
         if (currentScenario && updateScenario && saveScenarioOutput) {
-          await updateScenario(currentScenario.id, { status: 'completed' });
           await saveScenarioOutput(currentScenario.id, { 
             scenarioResults, 
             orderLogs, 
@@ -579,7 +586,13 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
             productFlowLogs, 
             tripLogs 
           });
+          await updateScenario(currentScenario.id, { status: 'completed' });
+          console.log("Results saved to database for scenario:", currentScenario.id);
         }
+        
+        toast.success("Simulation completed!", {
+          description: `${scenarioResults.length} scenarios analyzed with ${replications} replications each`,
+        });
         
         // Auto-navigate to results
         setActiveTab("results");
@@ -610,6 +623,15 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
 
         setSimulationResults(results);
         setOrderLogResults([]);
+        
+        // Save results and mark completed
+        if (currentScenario && updateScenario && saveScenarioOutput) {
+          await saveScenarioOutput(currentScenario.id, { 
+            scenarioResults: results 
+          });
+          await updateScenario(currentScenario.id, { status: 'completed' });
+        }
+        
         toast.success("Simulation completed!", {
           description: `${results.length} scenarios analyzed with ${replications} replications each`,
         });
@@ -622,6 +644,9 @@ const Index = ({ currentScenario, updateScenario, saveScenarioOutput, loadScenar
       toast.error("Simulation failed", {
         description: error instanceof Error ? error.message : "Unknown error occurred",
       });
+      if (currentScenario && updateScenario) {
+        await updateScenario(currentScenario.id, { status: 'failed' });
+      }
     } finally {
       setIsSimulating(false);
       setSimulationProgress(0);
