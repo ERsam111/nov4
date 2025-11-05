@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   MapPin,
   TrendingUp,
@@ -12,6 +13,15 @@ import {
   Zap,
   Clock,
   Truck,
+  Target,
+  Users,
+  Shield,
+  Lightbulb,
+  Mail,
+  Linkedin,
+  Twitter,
+  Github,
+  Quote,
 } from "lucide-react";
 
 const Index = () => {
@@ -214,6 +224,349 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* How It Works Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">How It Works</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Get started in minutes with our intuitive workflow
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+          {/* Connection Lines */}
+          <div className="hidden md:block absolute top-20 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-secondary to-accent opacity-30" 
+               style={{ width: '75%', marginLeft: '12.5%' }} />
+
+          {[
+            {
+              step: "01",
+              icon: Users,
+              title: "Sign Up",
+              description: "Create your free account in seconds and access all optimization tools",
+            },
+            {
+              step: "02",
+              icon: Target,
+              title: "Import Data",
+              description: "Upload your data via Excel or connect to your existing systems",
+            },
+            {
+              step: "03",
+              icon: BarChart3,
+              title: "Run Analysis",
+              description: "Choose your optimization module and let our algorithms work their magic",
+            },
+            {
+              step: "04",
+              icon: Lightbulb,
+              title: "Get Insights",
+              description: "Review actionable recommendations and implement optimization strategies",
+            },
+          ].map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div key={index} className="relative">
+                <div className="text-center space-y-4">
+                  <div className="relative inline-flex">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-xl opacity-20" />
+                    <div className="relative bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-lg">
+                      <Icon className="h-10 w-10 mx-auto text-primary" />
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {item.step}
+                  </div>
+                  <h3 className="text-xl font-semibold mt-6">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Value Propositions */}
+      <section className="border-y bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Our Platform</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Built by supply chain experts for supply chain professionals
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: "Enterprise-Grade Security",
+                description: "Your data is encrypted and secure with industry-leading security standards and compliance certifications",
+                color: "primary",
+              },
+              {
+                icon: Zap,
+                title: "Lightning Fast",
+                description: "Optimized algorithms deliver results in seconds, not hours. Run multiple scenarios effortlessly",
+                color: "secondary",
+              },
+              {
+                icon: Users,
+                title: "Expert Support",
+                description: "Dedicated support team and comprehensive documentation to help you succeed at every step",
+                color: "accent",
+              },
+            ].map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
+                  <CardHeader>
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${item.color} to-${item.color}/70 flex items-center justify-center mb-4 shadow-lg`}>
+                      <Icon className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{item.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Trusted by Supply Chain Leaders</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            See what our users have to say about their experience
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              quote: "This platform transformed our network design process. We reduced costs by 23% in the first quarter.",
+              author: "Sarah Chen",
+              role: "Supply Chain Director",
+              company: "Global Manufacturing Co.",
+            },
+            {
+              quote: "The demand forecasting module is incredibly accurate. It's become essential to our planning process.",
+              author: "Michael Rodriguez",
+              role: "Operations Manager",
+              company: "Retail Distribution Inc.",
+            },
+            {
+              quote: "Inventory optimization has never been easier. The Monte Carlo simulations give us confidence in our decisions.",
+              author: "Emily Watson",
+              role: "Logistics Head",
+              company: "E-commerce Solutions Ltd.",
+            },
+          ].map((testimonial, index) => (
+            <Card key={index} className="relative border-2 hover:border-primary/30 transition-all">
+              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+                <Quote className="h-6 w-6 text-white" />
+              </div>
+              <CardContent className="pt-8">
+                <p className="text-muted-foreground italic mb-6">"{testimonial.quote}"</p>
+                <div className="border-t pt-4">
+                  <p className="font-semibold">{testimonial.author}</p>
+                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <p className="text-sm text-primary">{testimonial.company}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="border-t bg-muted/30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg text-muted-foreground">
+              Everything you need to know about our platform
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                What types of supply chain problems can this platform solve?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Our platform addresses comprehensive supply chain challenges including facility location optimization (GFA), 
+                demand forecasting using advanced statistical models, multi-echelon network design, inventory optimization 
+                with Monte Carlo simulations, and transportation routing. Each module is designed to work independently or 
+                as part of an integrated solution.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                Do I need technical expertise to use this platform?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                No. While the underlying algorithms are sophisticated, the platform is designed with an intuitive interface 
+                that supply chain professionals can use without programming knowledge. We provide comprehensive guides, 
+                case studies, and tooltips throughout the application. For advanced users, we also offer API access and 
+                customization options.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                How do I import my data into the system?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Data import is flexible and straightforward. You can upload Excel/CSV files directly through our interface, 
+                use our template files to ensure proper formatting, or connect to your existing ERP/WMS systems via API. 
+                The platform automatically validates your data and provides feedback on any formatting issues.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                Is my data secure?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Absolutely. We use enterprise-grade encryption for data at rest and in transit, implement strict access 
+                controls, and maintain compliance with industry security standards. Your data is isolated in secure 
+                environments, and we never share it with third parties. Regular security audits ensure ongoing protection.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                Can I export the results and recommendations?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Yes. All analysis results, visualizations, and recommendations can be exported in multiple formats including 
+                Excel, PDF reports, and CSV files. You can also save scenarios for future comparison and share interactive 
+                dashboards with stakeholders.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold">
+                What kind of support do you provide?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                We offer comprehensive support including detailed documentation, video tutorials, case studies, and email 
+                support. Premium plans include dedicated account managers and consultation services to help you maximize 
+                the value from our platform.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="border-t bg-gradient-to-br from-primary via-secondary to-primary">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-white">
+            Ready to Optimize Your Supply Chain?
+          </h2>
+          <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+            Join supply chain professionals who are already transforming their operations with data-driven optimization
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all bg-white hover:bg-white/90"
+              onClick={() => navigate("/auth")}
+            >
+              Get Started Free
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white/10"
+              onClick={() => navigate("/auth")}
+            >
+              View Case Studies
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t bg-muted/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Supply Chain Intelligence
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Advanced analytics platform for network design, demand planning, and inventory optimization.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="/gfa" className="hover:text-primary transition-colors">GFA</a></li>
+                <li><a href="/demand-forecasting" className="hover:text-primary transition-colors">Demand Forecasting</a></li>
+                <li><a href="/network" className="hover:text-primary transition-colors">Network Analysis</a></li>
+                <li><a href="/inventory-optimization-v2" className="hover:text-primary transition-colors">Inventory Optimization</a></li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 className="font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Case Studies</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">API Reference</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Support</a></li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2025 Supply Chain Intelligence. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Linkedin className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Github className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Mail className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
