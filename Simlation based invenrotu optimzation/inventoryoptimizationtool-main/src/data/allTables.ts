@@ -7,7 +7,7 @@ export const customerColumns = [
 ];
 
 export const customerDataInitial = [
-  { "Customer Name": "C1", "Status": "Include", "Address": "", "City": "Boston", "Region": "MA", "Postal Code": "", "Country": "", "Latitude": 42.315002, "Longitude": -71.009623, "singlesource": "", "singlesourceorders": "false", "singlesourcelineitems": "false", "allowbackorders": "true", "backordertimelimit": 7, "backordertimeuom": "DAY", "allowpartialfillorders": "true", "allowpartialfilllineitems": "true", "allowdirectship": "", "notes": "a", "queuepriority": "" },
+  { "Customer Name": "C1", "Status": "Include", "Address": "", "City": "Boston", "Region": "MA", "Postal Code": "", "Country": "", "Latitude": 42.315002, "Longitude": -71.009623, "Single Source": "", "Single Source Orders": "false", "Single Source Line Items": "false", "Allow Backorders": "true", "Backorder Time Limit": 7, "Backorder Time UOM": "DAY", "Allow Partial Fill Orders": "true", "Allow Partial Fill Line Items": "true", "Allow Direct Ship": "", "Notes": "a", "Queue Priority": "" },
 ];
 
 // Facility Table
@@ -17,9 +17,9 @@ export const facilityColumns = [
 ];
 
 export const facilityDataInitial = [
-  { "Facility Name": "DC1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "DC", organization: "Company A", address: "123 Main St", city: "Chicago", region: "IL", postalcode: "60601", country: "USA", latitude: 41.506431, longitude: -87.596775, fixedstartupcost: 5000 },
-  { "Facility Name": "S1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "Factory", organization: "Company A", address: "456 Factory Rd", city: "Saint Louis", region: "MO", postalcode: "63118", country: "USA", latitude: 38.591684, longitude: -90.231376, fixedstartupcost: 10000 },
-  { "Facility Name": "Supplier_1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "Supplier", organization: "Raw Material Co", address: "789 Supply Ave", city: "Kansas City", region: "MO", postalcode: "64101", country: "USA", latitude: 39.099727, longitude: -94.578567, fixedstartupcost: 0 },
+  { "Facility Name": "DC1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "DC", "Organization": "Company A", "Address": "123 Main St", "City": "Chicago", "Region": "IL", "Postal Code": "60601", "Country": "USA", "Latitude": 41.506431, "Longitude": -87.596775, "Fixed Startup Cost": 5000 },
+  { "Facility Name": "S1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "Factory", "Organization": "Company A", "Address": "456 Factory Rd", "City": "Saint Louis", "Region": "MO", "Postal Code": "63118", "Country": "USA", "Latitude": 38.591684, "Longitude": -90.231376, "Fixed Startup Cost": 10000 },
+  { "Facility Name": "Supplier_1", "Status": "Include", "Facility Status": "Open", "Initial State": "Existing", "Type": "Supplier", "Organization": "Raw Material Co", "Address": "789 Supply Ave", "City": "Kansas City", "Region": "MO", "Postal Code": "64101", "Country": "USA", "Latitude": 39.099727, "Longitude": -94.578567, "Fixed Startup Cost": 0 },
 ];
 
 // Product Table
