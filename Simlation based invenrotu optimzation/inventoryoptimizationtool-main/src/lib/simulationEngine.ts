@@ -596,7 +596,11 @@ function runReplication(
             let actualProduction = Math.min(dailyProduction, facInv.S - facInv.inventory);
             
             // Check BOM and consume ALL raw materials
-            const bomEntry = input.bomData?.find((bom: any) => bom["End Product"] === facInv.productName);
+            // First try to get BOM ID from production policy, otherwise fallback to matching by product
+            const bomId = facilityProduction?.["BOM"];
+            const bomEntry = bomId 
+              ? input.bomData?.find((bom: any) => bom["BOM ID"] === bomId)
+              : input.bomData?.find((bom: any) => bom["End Product"] === facInv.productName);
             let rawMaterialsUsed: Array<{name: string, consumed: number, inventoryAfter: number}> = [];
             let canProduce = true;
             
@@ -716,7 +720,11 @@ function runReplication(
             let actualProduction = Math.min(dailyProduction, replenishQty);
             
             // Check BOM and consume ALL raw materials
-            const bomEntry = input.bomData?.find((bom: any) => bom["End Product"] === facInv.productName);
+            // First try to get BOM ID from production policy, otherwise fallback to matching by product
+            const bomId = facilityProduction?.["BOM"];
+            const bomEntry = bomId 
+              ? input.bomData?.find((bom: any) => bom["BOM ID"] === bomId)
+              : input.bomData?.find((bom: any) => bom["End Product"] === facInv.productName);
             let rawMaterialsUsed: Array<{name: string, consumed: number, inventoryAfter: number}> = [];
             let canProduce = true;
             

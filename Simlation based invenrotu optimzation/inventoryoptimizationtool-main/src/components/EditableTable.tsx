@@ -138,6 +138,37 @@ export const EditableTable = ({
                               toast.success("Parameters updated");
                             }}
                           />
+                        ) : col === "BOM" ? (
+                          // Show dropdown for BOM ID selection
+                          editingCell?.row === rowIndex && editingCell?.col === col ? (
+                            <div className="flex gap-1">
+                              <Select
+                                value={editValue}
+                                onValueChange={(val) => {
+                                  const newData = [...data];
+                                  newData[rowIndex][col] = val;
+                                  onDataChange(newData);
+                                  setEditingCell(null);
+                                  toast.success("BOM selected");
+                                }}
+                              >
+                                <SelectTrigger className="h-8 w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {(dropdownOptions?.["BOM ID"] || [])
+                                    .filter((opt) => opt)
+                                    .map((opt) => (
+                                      <SelectItem key={opt} value={opt}>
+                                        {opt}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          ) : (
+                            <span>{row[col] ?? ""}</span>
+                          )
                         ) : col === "Raw Materials" ? (
                           <BOMDialog
                             currentValue={row[col] || ""}

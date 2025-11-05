@@ -91,6 +91,7 @@ export interface Production {
   prod_rate_units_per_day: number;
   setup_time_days: number;
   prod_cost_per_unit: number;
+  bom_id?: string;
 }
 
 export interface PolicyParameter {
