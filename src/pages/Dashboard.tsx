@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, TrendingUp, Network, Gauge, Plus, Truck } from 'lucide-react';
+import { MapPin, TrendingUp, Network, Gauge, Plus, Truck, BookOpen } from 'lucide-react';
 import { useProjects } from '@/contexts/ProjectContext';
 import { useState } from 'react';
 import { CreateProjectDialog } from '@/components/CreateProjectDialog';
+import { CaseStudiesDialog } from '@/components/CaseStudiesDialog';
 
 const tools = [
   {
@@ -60,6 +61,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { projects } = useProjects();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [caseStudiesOpen, setCaseStudiesOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<typeof tools[0] | null>(null);
 
   const handleToolClick = (tool: typeof tools[0]) => {
@@ -76,6 +78,17 @@ const Dashboard = () => {
         <div className="relative px-6 py-12 md:py-16">
           <div className="max-w-4xl mx-auto">
             <div className="text-center space-y-6 animate-fade-in">
+              <div className="flex justify-center mb-4">
+                <Button
+                  onClick={() => setCaseStudiesOpen(true)}
+                  variant="outline"
+                  size="lg"
+                  className="group hover:border-gfa hover:bg-gfa/5"
+                >
+                  <BookOpen className="h-5 w-5 mr-2 text-gfa group-hover:scale-110 transition-transform" />
+                  Case Studies & User Guides
+                </Button>
+              </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gfa via-forecasting to-inventory bg-clip-text text-transparent animate-gradient pb-2 leading-tight">
                 Supply Chain Optimization
               </h1>
@@ -181,6 +194,11 @@ const Dashboard = () => {
           redirectTo={selectedTool.route}
         />
       )}
+      
+      <CaseStudiesDialog
+        open={caseStudiesOpen}
+        onOpenChange={setCaseStudiesOpen}
+      />
     </div>
   );
 };
