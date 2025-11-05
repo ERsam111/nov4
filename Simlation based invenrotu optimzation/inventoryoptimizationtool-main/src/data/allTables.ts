@@ -7,7 +7,7 @@ export const customerColumns = [
 ];
 
 export const customerDataInitial = [
-  { "Customer Name": "C1", status: "Include", address: "", city: "Boston", region: "MA", postalcode: "", country: "", latitude: 42.315002, longitude: -71.009623, singlesource: "", singlesourceorders: "false", singlesourcelineitems: "false", allowbackorders: "true", backordertimelimit: 7, backordertimeuom: "DAY", allowpartialfillorders: "true", allowpartialfilllineitems: "true", allowdirectship: "", notes: "a", queuepriority: "" },
+  { "Customer Name": "C1", Status: "Include", Address: "", City: "Boston", Region: "MA", Postal Code: "", Country: "", Latitude: 42.315002, Longitude: -71.009623, singlesource: "", singlesourceorders: "false", singlesourcelineitems: "false", allowbackorders: "true", backordertimelimit: 7, backordertimeuom: "DAY", allowpartialfillorders: "true", allowpartialfilllineitems: "true", allowdirectship: "", notes: "a", queuepriority: "" },
 ];
 
 // Facility Table
