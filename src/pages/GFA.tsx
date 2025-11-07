@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Play, MapPin, BarChart3, TrendingUp, Upload, Download } from "lucide-react";
+import { ArrowLeft, Play, MapPin, BarChart3, TrendingUp, Upload, Download, MessageSquare } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { GFAInputPanel } from "@/components/gfa/GFAInputPanel";
 import { GFAMapPanel } from "@/components/gfa/GFAMapPanel";
 import { GFAOptimizationPanel } from "@/components/gfa/GFAOptimizationPanel";
 import { GFAResultsPanel } from "@/components/gfa/GFAResultsPanel";
+import { GFADataSupport } from "@/components/gfa/GFADataSupport";
 import { ScenarioSelector } from "@/components/gfa/ScenarioSelector";
 import { useScenarios } from "@/contexts/ScenarioContext";
 import { ProjectScenarioNav } from "@/components/ProjectScenarioNav";
@@ -231,10 +232,14 @@ const GFA = () => {
       {/* Main Content */}
       <div className="flex-1 max-w-7xl mx-auto w-full p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="input" className="gap-2" disabled={!currentScenario}>
               <Upload className="h-4 w-4" />
               Input Data
+            </TabsTrigger>
+            <TabsTrigger value="datasupport" className="gap-2" disabled={!currentScenario}>
+              <MessageSquare className="h-4 w-4" />
+              Data Support
             </TabsTrigger>
             <TabsTrigger value="map" className="gap-2" disabled={!currentScenario}>
               <MapPin className="h-4 w-4" />
@@ -258,6 +263,16 @@ const GFA = () => {
               onCustomersChange={setCustomers}
               onProductsChange={setProducts}
               onSettingsChange={setSettings}
+            />
+          </TabsContent>
+
+          <TabsContent value="datasupport" className="space-y-6">
+            <GFADataSupport
+              customers={customers}
+              products={products}
+              dcs={dcs}
+              settings={settings}
+              costBreakdown={costBreakdown}
             />
           </TabsContent>
 
