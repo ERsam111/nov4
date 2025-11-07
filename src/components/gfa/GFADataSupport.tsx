@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Send, Loader2, Bot, User } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MessageSquare, Send, Loader2, Bot, User, Trash2 } from "lucide-react";
 import { Customer, Product, DistributionCenter, OptimizationSettings } from "@/types/gfa";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 interface Message {
@@ -27,6 +30,7 @@ export function GFADataSupport({
   settings,
   costBreakdown,
 }: GFADataSupportProps) {
+  const { session } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -35,6 +39,7 @@ export function GFADataSupport({
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
   const scrollRef = useRef<HTMLDivElement>(null);
   const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gfa-chat`;
 
@@ -44,6 +49,82 @@ export function GFADataSupport({
     }
   }, [messages]);
 
+  // Load conversation history on mount
+  useEffect(() => {
+    loadConversationHistory();
+  }, [session]);
+
+  const loadConversationHistory = async () => {
+    if (!session?.user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("gfa_chat_messages")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: true })
+        .limit(50);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const loadedMessages = data
+          .filter(msg => msg.role !== "system")
+          .map(msg => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content
+          }));
+        
+        // Add welcome message if there are loaded messages
+        if (loadedMessages.length > 0) {
+          setMessages(loadedMessages);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading conversation history:", error);
+    }
+  };
+
+  const saveMessage = async (role: string, content: string) => {
+    if (!session?.user?.id) return;
+
+    try {
+      await supabase.from("gfa_chat_messages").insert({
+        user_id: session.user.id,
+        scenario_id: null,
+        role,
+        content,
+        model: selectedModel
+      });
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
+
+  const clearHistory = async () => {
+    if (!session?.user?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from("gfa_chat_messages")
+        .delete()
+        .eq("user_id", session.user.id);
+
+      if (error) throw error;
+
+      setMessages([
+        {
+          role: "assistant",
+          content: "Hello! I'm your GFA Data Assistant. I can help you understand your input data, explain what's required for optimization, and analyze your results. Ask me anything!"
+        }
+      ]);
+      toast.success("Conversation history cleared");
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      toast.error("Failed to clear history");
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -51,6 +132,9 @@ export function GFADataSupport({
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+
+    // Save user message
+    await saveMessage("user", input);
 
     try {
       const resp = await fetch(CHAT_URL, {
@@ -67,7 +151,8 @@ export function GFADataSupport({
             dcs,
             settings,
             costBreakdown,
-          }
+          },
+          model: selectedModel
         }),
       });
 
@@ -78,7 +163,7 @@ export function GFADataSupport({
       }
 
       if (resp.status === 402) {
-        toast.error("AI usage limit reached. Please add credits to continue.");
+        toast.error("AI usage limit reached. Please check your OpenAI account.");
         setIsLoading(false);
         return;
       }
@@ -135,6 +220,11 @@ export function GFADataSupport({
         }
       }
 
+      // Save assistant message after streaming completes
+      if (assistantContent) {
+        await saveMessage("assistant", assistantContent);
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Chat error:", error);
@@ -154,13 +244,39 @@ export function GFADataSupport({
   return (
     <Card className="h-[calc(100vh-16rem)] flex flex-col">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
-          Data Support Assistant
-        </CardTitle>
-        <CardDescription>
-          Ask questions about your data, required columns, statistics, and optimization results
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Data Support Assistant
+            </CardTitle>
+            <CardDescription>
+              Ask questions about your data, required columns, statistics, and optimization results
+            </CardDescription>
+          </div>
+          <div className="flex gap-2 items-center">
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+                <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+              </SelectContent>
+            </Select>
+            {messages.length > 1 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearHistory}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-4 gap-4 min-h-0">
         <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
